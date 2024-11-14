@@ -143,16 +143,16 @@ const ViewAttendancesBySemester = () => {
         <TableCaption>A list of students and their roll numbers.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">စဉ်</TableHead>
+            <TableHead className="w-[100px]">No</TableHead>
 
-            <TableHead className="w-[100px]">ခုံနံပါတ်</TableHead>
-            <TableHead>နာမည်</TableHead>
+            <TableHead className="w-[100px]">Roll Number</TableHead>
+            <TableHead>Name</TableHead>
             {startMonthToEndMonth?.map((month, index) => (
               <TableHead key={index} className="text-center">
                 {month}
               </TableHead>
             ))}
-            <TableHead>ရာခိုင်နှုန်း</TableHead>
+            <TableHead>%</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

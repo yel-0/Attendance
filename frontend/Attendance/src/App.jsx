@@ -29,7 +29,7 @@ function App() {
     location.pathname === "/login" || location.pathname === "/register";
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen relative max-w-[1440px] mx-auto flex flex-col">
       {isAuthRoute ? (
         <AuthLayout>
           <Routes>

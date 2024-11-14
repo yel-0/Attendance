@@ -136,13 +136,13 @@ const AttendanceStudent = ({ studentClass }) => {
             to={`/view/attendances/${classId}`}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600"
           >
-            အပတ်စဉ်
+            Weekly
           </Link>
           <Link
             to={`/view/attendances/semester/${classId}`}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600"
           >
-            လစဉ်
+            Monthly
           </Link>
           <CreateSessionDialog classId={classId} mydate={formatDate(date)} />
         </div>
@@ -156,9 +156,9 @@ const AttendanceStudent = ({ studentClass }) => {
           </TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">စဉ်</TableHead>
-              <TableHead className="">ခုံနံပါတ်</TableHead>
-              <TableHead>နာမည်</TableHead>
+              <TableHead className="w-[100px]">No</TableHead>
+              <TableHead className="">Roll Number</TableHead>
+              <TableHead>Name</TableHead>
               {timeSlots.map((slot, index) => (
                 <TableHead key={index}>
                   <DeleteSessionDialog

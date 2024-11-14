@@ -43,7 +43,7 @@ const AdminClasses = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>အတန်းအမည်</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>Teacher</TableHead>
             <TableHead>Email</TableHead>
             <TableHead className="flex flex-row justify-center items-center">

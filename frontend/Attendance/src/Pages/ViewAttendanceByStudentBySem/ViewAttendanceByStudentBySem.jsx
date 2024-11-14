@@ -138,10 +138,10 @@ const ViewAttendanceByStudentBySem = () => {
         <TableCaption>Student Attendance Records by Month</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>လစဉ်</TableHead>
+            <TableHead>Monthly</TableHead>
             <TableHead className="text-center">Attended Sessions</TableHead>
             <TableHead className="text-center">Total Sessions</TableHead>
-            <TableHead className="text-center">ရာခိုင်နှုန်း</TableHead>
+            <TableHead className="text-center">%</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

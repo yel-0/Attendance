@@ -144,10 +144,10 @@ const ViewAttendanceByStudent = () => {
         <TableCaption>Attendance Summary by Week</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>အပတ်စဉ်</TableHead> {/* Week */}
+            <TableHead>Weekly</TableHead> {/* Week */}
             <TableHead>Total Sessions</TableHead>
             <TableHead>Attended Count</TableHead>
-            <TableHead>ရာခိုင်နှုန်း</TableHead> {/* Percentage */}
+            <TableHead>%</TableHead> {/* Percentage */}
           </TableRow>
         </TableHeader>
         <TableBody>

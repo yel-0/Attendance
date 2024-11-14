@@ -84,9 +84,9 @@ const ViewAttendances = () => {
         <TableCaption>A list of student attendances.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">စဉ်</TableHead>
-            <TableHead className="w-[200px]">ခုံနံပါတ်</TableHead>
-            <TableHead>နာမည်</TableHead>
+            <TableHead className="w-[100px]">No</TableHead>
+            <TableHead className="w-[200px]">Roll Number</TableHead>
+            <TableHead>Name</TableHead>
             {studentAttendanceByWeek?.length > 0 &&
               studentAttendanceByWeek.map((week, index) => (
                 <TableHead key={index}>
@@ -96,7 +96,7 @@ const ViewAttendances = () => {
               ))}
             <TableHead>Total Session</TableHead>
 
-            <TableHead className="text-right">ရာခိုင်နှုန်း</TableHead>
+            <TableHead className="text-right">%</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

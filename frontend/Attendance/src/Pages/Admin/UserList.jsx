@@ -33,10 +33,10 @@ const UserList = () => {
       <TableHeader>
         <TableRow>
           <TableHead className="w-[100px]">ID</TableHead>
-          <TableHead>နာမည်</TableHead>
+          <TableHead>Name</TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Role</TableHead>
-          <TableHead className="">ခုံနံပါတ်</TableHead>
+          <TableHead className="">Roll Number</TableHead>
           <TableHead className=" flex flex-row justify-center items-center">
             Action
           </TableHead>

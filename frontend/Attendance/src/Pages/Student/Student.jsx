@@ -32,8 +32,8 @@ const Student = () => {
       <Table className="border bg-white shadow ">
         <TableHeader>
           <TableRow>
-            <TableHead>ခုံနံပါတ်</TableHead>
-            <TableHead className="w-[200px]">နာမည်</TableHead>
+            <TableHead>Roll Number</TableHead>
+            <TableHead className="w-[200px]">Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead className="text-center">Actions</TableHead>
           </TableRow>
