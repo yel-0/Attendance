@@ -61,6 +61,30 @@ class AccountController extends Controller
         ]);
     }
 
+    public function getUserInfo(Request $request)
+{
+    try {
+        // Attempt to authenticate the user using the token in the header
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return response()->json([
+            'message' => 'User information retrieved successfully',
+            'user' => $user,
+        ]);
+    } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+        return response()->json(['error' => 'Token expired'], 401);
+    } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+        return response()->json(['error' => 'Token is invalid'], 401);
+    } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+        return response()->json(['error' => 'Token is absent'], 401);
+    }
+}
+
+
     public function index()
     {
         $accounts = Account::all();

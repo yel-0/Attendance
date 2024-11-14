@@ -18,6 +18,7 @@ Route::middleware(['auth:api', 'check.admin'])->get('/accounts/role/{role}', [Ac
 Route::middleware(['auth:api', 'check.admin'])->get('/accounts/students/{roleNumber}', [AccountController::class, 'findByRoleAndRoleNumber']);
 Route::middleware(['auth:api', 'check.admin'])->put('/accounts/{id}', [AccountController::class, 'update']);
 Route::middleware(['auth:api', 'check.admin'])->delete('/accounts/{id}', [AccountController::class, 'destroy']);
+Route::get('/account/info', [AccountController::class, 'getUserInfo']);
 
 Route::middleware(['auth:api', 'check.admin'])->group(function () {
     Route::post('/classrooms', [ClassroomController::class, 'store']);

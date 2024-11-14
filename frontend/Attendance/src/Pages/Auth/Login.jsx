@@ -3,6 +3,7 @@ import { useMutation } from "react-query";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/Provider/AuthProvider";
 
 const loginUser = async (loginData) => {
   const response = await axios.post(
@@ -15,6 +16,7 @@ const loginUser = async (loginData) => {
 const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,18 +28,23 @@ const Login = () => {
     loginUser,
     {
       onSuccess: (data) => {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.account));
+        login(data.token);
+
+        // localStorage.setItem("token", data.token);
+        // localStorage.setItem("user", JSON.stringify(data.account));
 
         toast({
-          title: "login successfully",
+          title: "Login Successful",
+          description: "Welcome back! You have successfully logged in.",
         });
         navigate("/");
       },
       onError: (error) => {
         toast({
           variant: "destructive",
-          title: "something is wrong",
+          title: "Login Failed",
+          description:
+            "We couldn't log you in. Please check your credentials and try again.",
         });
       },
     }
