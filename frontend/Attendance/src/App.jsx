@@ -51,29 +51,6 @@ function App() {
                   />
                 }
               />
-              {/* <Route
-                path="/classes"
-                element={
-                  <ProtectedRoute
-                    element={<Classes />}
-                    allowedRoles={["teacher", "admin"]}
-                  />
-                }
-              /> */}
-              {/* <Route
-                path="/classSessions/:id"
-                element={
-                  <ProtectedRoute
-                    element={<ClassSessions />}
-                    allowedRoles={["teacher", "admin"]}
-                  />
-                }
-              /> */}
-              {/* Uncomment this if you want to protect the profile route */}
-              {/* <Route
-                path="/me"
-                element={<ProtectedRoute element={<Profile />} allowedRoles={['student', 'teacher', 'admin']} />}
-              /> */}
               <Route
                 path="/students/:id"
                 element={
@@ -101,15 +78,7 @@ function App() {
                   />
                 }
               />
-              {/* <Route
-                path="/adminClassSession/:id"
-                element={
-                  <ProtectedRoute
-                    element={<AdminClassSessions />}
-                    allowedRoles={["admin"]}
-                  />
-                }
-              /> */}
+
               <Route
                 path="/view/attendances/:classId"
                 element={

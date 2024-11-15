@@ -12,12 +12,20 @@ import { useTeacherClassrooms } from "@/Hooks/Classrooms/useTeacherClassrooms ";
 import { useClassroomsByAuthStudent } from "@/Hooks/StudentClasses/useClassroomsByAuthStudent";
 import { Triangle } from "lucide-react";
 import { GraduationCap } from "lucide-react";
+import { useAuth } from "@/Provider/AuthProvider";
 const SideBarNavigation = () => {
-  const { data, isError, isLoading } = useTeacherClassrooms();
+  const { data, isLoading: userLoading } = useAuth();
+  const user = data?.user;
+  const role = user?.role;
+
+  const {
+    data: teacherClassrooms,
+    isError,
+    isLoading,
+  } = useTeacherClassrooms(role === "teacher");
 
   const [isClassesOpen, setIsClassesOpen] = useState(false);
-  const user = JSON.parse(localStorage.getItem("user"));
-  const { role } = user || {};
+
   const {
     data: studentClass,
     isLoading: studentClassLoading,
@@ -32,7 +40,7 @@ const SideBarNavigation = () => {
             to="/"
             className="flex flex-row justify-center items-center gap-3 "
           >
-            <Triangle /> Attendance System
+            <Triangle /> Attendance System {role}
           </Link>
         </div>
       </div>
@@ -61,7 +69,7 @@ const SideBarNavigation = () => {
                 </button>
                 {isClassesOpen && (
                   <ul className="ml-8  space-y-2 mt-2">
-                    {data?.map((classItem) => (
+                    {teacherClassrooms?.map((classItem) => (
                       <li key={classItem.id}>
                         <Link
                           to={`/attendance/${classItem.id}`}

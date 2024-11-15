@@ -5,6 +5,8 @@ const fetchTeacherClassrooms = async () => {
   return response.data;
 };
 
-export const useTeacherClassrooms = () => {
-  return useQuery("teacherClassrooms", fetchTeacherClassrooms);
+export const useTeacherClassrooms = (enabled) => {
+  return useQuery("teacherClassrooms", fetchTeacherClassrooms, {
+    enabled,
+  });
 };

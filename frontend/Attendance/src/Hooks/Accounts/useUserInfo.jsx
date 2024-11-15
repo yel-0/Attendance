@@ -5,12 +5,9 @@ const fetchUserInfo = async () => {
   return response.data;
 };
 
-const useUserInfo = () => {
+const useUserInfo = (token) => {
   return useQuery("userInfo", fetchUserInfo, {
-    onError: (error) => {
-      console.error("Failed to fetch user info:", error);
-    },
+    enabled: !!token,
   });
 };
-
 export default useUserInfo;

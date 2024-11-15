@@ -7,11 +7,9 @@ import useUserInfo from "@/Hooks/Accounts/useUserInfo";
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
-  const { data, isLoading } = useUserInfo();
+  const { data, isLoading } = useUserInfo(token);
   const { toast } = useToast();
   const navigate = useNavigate();
-  // console.log(data);
-  console.log("token" + token);
 
   useEffect(() => {
     const tokenData = JSON.parse(localStorage.getItem("token"));
@@ -46,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, data, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

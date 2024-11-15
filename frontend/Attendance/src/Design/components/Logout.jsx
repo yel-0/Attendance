@@ -8,11 +8,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
+import { useAuth } from "@/Provider/AuthProvider";
 const Logout = () => {
+  const { logout } = useAuth();
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    logout();
     window.location.href = "/login";
   };
 

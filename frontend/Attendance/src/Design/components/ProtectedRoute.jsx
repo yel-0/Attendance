@@ -1,11 +1,11 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/Hooks/User/useAuth";
+import { useAuth } from "@/Provider/AuthProvider";
 const ProtectedRoute = ({ element: Element, allowedRoles }) => {
-  const { user } = useAuth(); // Custom hook to get user data
+  const { data, isLoading } = useAuth();
+  const user = data?.user;
   const location = useLocation();
-  const userRole = user?.role; // Assuming user role is available
-  // console.log(user);
+  const userRole = user?.role;
   if (!userRole) {
     // If user is not logged in, redirect to login
     return <Navigate to="/login" state={{ from: location }} />;
