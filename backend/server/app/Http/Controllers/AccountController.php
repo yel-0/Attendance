@@ -102,7 +102,7 @@ public function index(Request $request)
 
     // Apply roll_number filter if present
     if ($rollNumber) {
-        $query->where('roll_number', $rollNumber);
+        $query->where('roleNumber', $rollNumber);
     }
 
     // Add pagination logic

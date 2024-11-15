@@ -37,7 +37,7 @@ const UserList = () => {
 
   // Handle filter button click
   const handleFilterClick = () => {
-    setRollNumber(inputValue); // Set rollNumber only when the button is clicked
+    setRollNumber(inputValue);
   };
 
   if (isLoading) {
