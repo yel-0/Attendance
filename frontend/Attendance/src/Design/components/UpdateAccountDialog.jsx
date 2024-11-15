@@ -58,7 +58,7 @@ const UpdateAccountDialog = ({ account }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className="px-4 py-2  rounded-lg bg-blue-400 text-white ">
+        <button className="px-4 py-2 rounded-lg bg-blue-400 text-white ">
           Update
         </button>
       </DialogTrigger>
@@ -124,22 +124,25 @@ const UpdateAccountDialog = ({ account }) => {
             </select>
           </div>
 
-          <div>
-            <label
-              htmlFor="roleNumber"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Role Number
-            </label>
-            <input
-              type="text"
-              name="roleNumber"
-              id="roleNumber"
-              value={formData.roleNumber}
-              onChange={handleChange}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          {/* Conditionally render Role Number input */}
+          {formData.role !== "admin" && formData.role !== "teacher" && (
+            <div>
+              <label
+                htmlFor="roleNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Role Number
+              </label>
+              <input
+                type="text"
+                name="roleNumber"
+                id="roleNumber"
+                value={formData.roleNumber}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          )}
 
           <div className="flex justify-end space-x-3 mt-4">
             <button

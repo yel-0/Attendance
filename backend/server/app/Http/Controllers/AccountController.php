@@ -85,14 +85,38 @@ class AccountController extends Controller
 }
 
 
-    public function index()
-    {
-        $accounts = Account::all();
+// In the AccountController
+public function index(Request $request)
+{
+    $role = $request->query('role');
+    $rollNumber = $request->query('roll_number'); // Get the roll_number filter from the query string
+    $page = $request->query('page', 1); // Default to page 1
+    $limit = $request->query('limit', 2); // Default limit to 2
 
-        return response()->json([
-            'accounts' => $accounts
-        ]);
+    $query = Account::query();
+
+    // Apply role filter if present
+    if ($role) {
+        $query->where('role', $role);
     }
+
+    // Apply roll_number filter if present
+    if ($rollNumber) {
+        $query->where('roll_number', $rollNumber);
+    }
+
+    // Add pagination logic
+    $accounts = $query->paginate($limit, ['*'], 'page', $page);
+
+    return response()->json([
+        'accounts' => $accounts->items(),
+        'total' => $accounts->total(),
+        'current_page' => $accounts->currentPage(),
+        'last_page' => $accounts->lastPage(),
+    ]);
+}
+
+
 
     public function getAccountsByRole($role)
     {

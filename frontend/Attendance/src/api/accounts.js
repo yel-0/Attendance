@@ -1,7 +1,14 @@
 import axiosInstance from "./axiosInstance";
+export const fetchAccounts = async (role, rollNumber, page, limit) => {
+  const params = {
+    role,
+    roll_number: rollNumber,
+    page,
+    limit,
+  };
+  console.log(params);
 
-export const fetchAccounts = async () => {
-  const response = await axiosInstance.get("/accounts");
+  const response = await axiosInstance.get("/accounts", { params });
   return response.data;
 };
 
