@@ -40,7 +40,7 @@ const SideBarNavigation = () => {
             to="/"
             className="flex flex-row justify-center items-center gap-3 "
           >
-            <Triangle /> Attendance System {role}
+            <Triangle /> Attendance System
           </Link>
         </div>
       </div>

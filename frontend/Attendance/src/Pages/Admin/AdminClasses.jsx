@@ -36,6 +36,7 @@ const AdminClasses = () => {
       {/* <h2 className="text-2xl font-bold text-center mb-6">Classes</h2> */}
       <div className="w-full flex flex-row justify-end  mb-2">
         <CreateClassDialog />
+        <Link to={`/create/classroom`}>to create clss </Link>
       </div>
 
       <Table className="border bg-white shadow">
@@ -60,13 +61,16 @@ const AdminClasses = () => {
                   to={`/students/${classInfo.id}`}
                   className="text-blue-500 hover:text-blue-600 font-medium text-sm"
                 >
-                  {classInfo.name}
+                  {classInfo.name}| {classInfo.subject} | {classInfo.session}
                 </Link>
               </TableCell>
-              <TableCell>{classInfo.teacher.name}</TableCell>
+              <TableCell>{classInfo.teacher.name} </TableCell>
               <TableCell>{classInfo.teacher.email}</TableCell>
               <TableCell className="flex justify-center items-center flex-row gap-4">
-                <UpdateClassDialog classData={classInfo} />
+                {/* <UpdateClassDialog classData={classInfo} /> */}
+                <Link to={`/update/classroom/${classInfo.id}`}>
+                  Update class
+                </Link>
                 <DeleteClassDialog
                   classData={classInfo}
                   classId={classInfo.id}

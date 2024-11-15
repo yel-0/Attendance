@@ -25,6 +25,7 @@ Route::middleware(['auth:api', 'check.admin'])->group(function () {
     Route::put('/classrooms/{id}', [ClassroomController::class, 'update']);
     Route::delete('/classrooms/{id}', [ClassroomController::class, 'destroy']);
     Route::get('/classrooms', [ClassroomController::class, 'index']);
+    Route::get('/classrooms/{id}', [ClassroomController::class, 'getClassRoomById']);
 });
 Route::middleware(['auth:api'])->get('/classrooms/teacher', [ClassroomController::class, 'getClassroomsByTeacherId']);
 Route::middleware(['auth:api'])->get('/classrooms/name/{name}', [ClassroomController::class, 'getClassroomsByName']);

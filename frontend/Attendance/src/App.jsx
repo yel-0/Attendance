@@ -21,6 +21,8 @@ import ViewAttendanceByStudent from "./Pages/ViewAttendanceByStudent/ViewAttenda
 import ViewAttendanceByStudentBySem from "./Pages/ViewAttendanceByStudentBySem/ViewAttendanceByStudentBySem";
 import ProtectedRoute from "./Design/components/ProtectedRoute";
 import ForbiddenPage from "./Pages/ForbiddenPage/ForbiddenPage";
+import AdminCreateClassRoom from "./Pages/Admin/AdminCreateClassRoom";
+import AdminUpdateClassRoom from "./Pages/Admin/AdminUpdateClassRoom";
 
 function App() {
   const location = useLocation();
@@ -47,6 +49,24 @@ function App() {
                 element={
                   <ProtectedRoute
                     element={<Admin />}
+                    allowedRoles={["admin"]}
+                  />
+                }
+              />
+              <Route
+                path="/create/classroom"
+                element={
+                  <ProtectedRoute
+                    element={<AdminCreateClassRoom />}
+                    allowedRoles={["admin"]}
+                  />
+                }
+              />
+              <Route
+                path="/update/classroom/:id"
+                element={
+                  <ProtectedRoute
+                    element={<AdminUpdateClassRoom />}
                     allowedRoles={["admin"]}
                   />
                 }

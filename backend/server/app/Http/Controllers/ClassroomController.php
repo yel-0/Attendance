@@ -18,13 +18,17 @@ class ClassroomController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'teacher_id' => 'required|exists:accounts,id',
+            'subject' => 'required|string|max:255',  // Validate subject field
+            'session' => 'required|string|max:1|in:A,B,C',  // Validate session field with limited options
         ]);
-
+    
         $classroom = Classroom::create([
             'name' => $request->input('name'),
             'teacher_id' => $request->input('teacher_id'),
+            'subject' => $request->input('subject'),  // Add subject field
+            'session' => $request->input('session'),  // Add session field
         ]);
-
+    
         return response()->json($classroom, Response::HTTP_CREATED);
     }
 
@@ -35,23 +39,42 @@ class ClassroomController extends Controller
     {
         // Find the classroom by ID
         $classroom = Classroom::find($id);
+    
+        // Check if the classroom exists
+        if (!$classroom) {
+            return response()->json(['message' => 'Classroom not found'], 404);
+        }
+    
+        // Validate the request data
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'teacher_id' => 'exists:accounts,id',
+            'subject' => 'required|string|max:255', // Added subject field validation
+            'session' => 'required|string|max:50',  // Added session field validation
+        ]);
+    
+        // Update the classroom
+        $classroom->update($validated);
+    
+        // Return the updated classroom
+        return response()->json([
+            'message' => 'Classroom updated successfully',
+            'classroom' => $classroom
+        ]);
+    }
+    
+    public function getClassRoomById($id)
+    {
+        // Find the classroom by ID
+        $classroom = Classroom::find($id);
 
         // Check if the classroom exists
         if (!$classroom) {
             return response()->json(['message' => 'Classroom not found'], 404);
         }
 
-        // Validate the request data
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'teacher_id' => 'exists:accounts,id',
-        ]);
-
-        // Update the classroom
-        $classroom->update($validated);
-
-        // Return the updated classroom
-        return response()->json($classroom);
+        // Return the classroom details
+        return response()->json(['classroom' => $classroom]);
     }
 
     /**
