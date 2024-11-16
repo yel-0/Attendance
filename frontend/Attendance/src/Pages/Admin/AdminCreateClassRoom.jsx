@@ -60,15 +60,21 @@ const AdminCreateClassRoom = () => {
           >
             Class Name
           </label>
-          <input
+          <select
             id="name"
             name="name"
-            type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
             className="mt-1 block w-full h-12 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-lg"
-          />
+          >
+            <option value="">Select a class</option>
+            <option value="First Year">First Year</option>
+            <option value="Second Year">Second Year</option>
+            <option value="Third Year">Third Year</option>
+            <option value="Fourth Year">Fourth Year</option>
+            <option value="Fifth Year">Fifth Year</option>
+          </select>
         </div>
         <div>
           <label

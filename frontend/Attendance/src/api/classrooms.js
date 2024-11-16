@@ -1,10 +1,10 @@
 import axiosInstance from "./axiosInstance";
-
-export const fetchClassrooms = async () => {
-  const response = await axiosInstance.get("/classrooms");
+export const fetchClassrooms = async (name = "", session = "") => {
+  const response = await axiosInstance.get("/classrooms", {
+    params: { name, session },
+  });
   return response.data;
 };
-
 export const updateClassroom = async (id, updatedData) => {
   try {
     const response = await axiosInstance.put(`/classrooms/${id}`, updatedData);

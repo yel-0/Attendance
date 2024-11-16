@@ -88,13 +88,30 @@ class ClassroomController extends Controller
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        // Eager load the teacher relationship
-        $classrooms = Classroom::with('teacher')->get();
-    
+        // Get the 'name' and 'session' query parameters
+        $name = $request->query('name');
+        $session = $request->query('session');
+        
+        // Build the query with optional filtering
+        $query = Classroom::with('teacher');
+        
+        // Filter by name if provided
+        if ($name) {
+            $query->where('name', 'like', '%' . $name . '%');
+        }
+        
+        // Filter by session if provided
+        if ($session) {
+            $query->where('session', $session);
+        }
+        
+        $classrooms = $query->get(); // Execute the query
+        
         return response()->json($classrooms);
     }
+    
     
 
     /**

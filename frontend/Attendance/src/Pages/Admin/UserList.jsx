@@ -113,7 +113,7 @@ const UserList = () => {
               <TableCell>{account.name}</TableCell>
               <TableCell>{account.email}</TableCell>
               <TableCell>{account.role}</TableCell>
-              <TableCell>{account.rollNumber}</TableCell>
+              <TableCell>{account.roleNumber}</TableCell>
               <TableCell className="flex justify-center items-center flex-row gap-4">
                 <UpdateAccountDialog account={account} />
                 <DeleteAccountDialog

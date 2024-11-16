@@ -1,12 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-// import CreateClassDialog from "@/Design/components/CreateClassDialog";
-// import UpdateClassDialog from "@/Design/components/UpdateClassDialog";
-// import DeleteClassDialog from "@/Design/components/DeleteClassDialog";
-import CreateClassDialog from "@/Design/components/CreateClassDialog";
-import UpdateClassDialog from "@/Design/components/UpdateClassDialog";
 import DeleteClassDialog from "@/Design/components/DeleteClassDialog";
-// import useClassrooms from "@/Hooks/Classrooms/useClassrooms";
 import useClassrooms from "@/Hooks/Classrooms/useClassrooms ";
 import {
   Table,
@@ -19,7 +13,9 @@ import {
 } from "@/components/ui/table";
 
 const AdminClasses = () => {
-  const { data, error, isLoading } = useClassrooms();
+  const [filter, setFilter] = useState("First Year");
+  const [sessionFilter, setSessionFilter] = useState(""); // State for session filter
+  const { data, error, isLoading } = useClassrooms(filter, sessionFilter);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -33,12 +29,48 @@ const AdminClasses = () => {
 
   return (
     <div>
-      {/* <h2 className="text-2xl font-bold text-center mb-6">Classes</h2> */}
-      <div className="w-full flex flex-row justify-end  mb-2">
-        <CreateClassDialog />
-        <Link to={`/create/classroom`}>to create clss </Link>
+      {/* Filter Dropdown */}
+      <div className="w-full flex flex-row justify-between mb-4">
+        <div className="flex flex-row gap-3">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="border border-gray-300 rounded-md px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="First Year">First Year</option>
+            <option value="Second Year">Second Year</option>
+            <option value="Third Year">Third Year</option>
+            <option value="Fourth Year">Fourth Year</option>
+            <option value="Fifth Year">Fifth Year</option>
+          </select>
+
+          <select
+            value={sessionFilter}
+            onChange={(e) => setSessionFilter(e.target.value)}
+            className="border border-gray-300 rounded-md px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">All Sessions</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+          </select>
+        </div>
+        <Link
+          to="/create/classroom"
+          className="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Create Classroom
+        </Link>
       </div>
 
+      {/* Classrooms Table */}
       <Table className="border bg-white shadow">
         <TableCaption>A list of classes.</TableCaption>
         <TableHeader>
@@ -64,13 +96,16 @@ const AdminClasses = () => {
                   {classInfo.name}| {classInfo.subject} | {classInfo.session}
                 </Link>
               </TableCell>
-              <TableCell>{classInfo.teacher.name} </TableCell>
+              <TableCell>{classInfo.teacher.name}</TableCell>
               <TableCell>{classInfo.teacher.email}</TableCell>
               <TableCell className="flex justify-center items-center flex-row gap-4">
-                {/* <UpdateClassDialog classData={classInfo} /> */}
-                <Link to={`/update/classroom/${classInfo.id}`}>
-                  Update class
+                <Link
+                  to={`/update/classroom/${classInfo.id}`}
+                  className="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  Update Class
                 </Link>
+
                 <DeleteClassDialog
                   classData={classInfo}
                   classId={classInfo.id}
