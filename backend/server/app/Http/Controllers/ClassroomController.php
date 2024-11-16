@@ -19,7 +19,7 @@ class ClassroomController extends Controller
             'name' => 'required|string|max:255',
             'teacher_id' => 'required|exists:accounts,id',
             'subject' => 'required|string|max:255',  // Validate subject field
-            'session' => 'required|string|max:1|in:A,B,C',  // Validate session field with limited options
+            'session' => 'required|string|max:50',  // Validate session field with limited options
         ]);
     
         $classroom = Classroom::create([
@@ -65,18 +65,21 @@ class ClassroomController extends Controller
     
     public function getClassRoomById($id)
     {
-        // Find the classroom by ID
-        $classroom = Classroom::find($id);
-
+        // Find the classroom by ID, including the teacher's details
+        $classroom = Classroom::with('teacher')->find($id);
+    
         // Check if the classroom exists
         if (!$classroom) {
             return response()->json(['message' => 'Classroom not found'], 404);
         }
-
-        // Return the classroom details
-        return response()->json(['classroom' => $classroom]);
+    
+        // Return the classroom details with teacher information
+        return response()->json([
+            'classroom' => $classroom,
+            'teacher' => $classroom->teacher, // Include the teacher's info
+        ]);
     }
-
+    
     /**
      * Delete a classroom.
      */

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
-import useAccountsByRole from "@/Hooks/Accounts/useAccountsByRole ";
+import useTeachersByName from "@/Hooks/Accounts/useTeachersByName";
 const createClassroom = async (classroomData) => {
   const response = await axiosInstance.post("/classrooms", classroomData);
   return response.data;
@@ -10,13 +10,15 @@ const createClassroom = async (classroomData) => {
 
 const AdminCreateClassRoom = () => {
   const { toast } = useToast();
-  const { data, isError, isLoading } = useAccountsByRole("teacher");
   const queryClient = useQueryClient();
 
   const [name, setName] = useState("");
   const [teacherId, setTeacherId] = useState("");
   const [subject, setSubject] = useState("");
   const [session, setSession] = useState("");
+  const [query, setQuery] = useState(""); // For teacher search input
+
+  const { data: teachers, isError, isLoading } = useTeachersByName(query);
 
   const mutation = useMutation({
     mutationFn: createClassroom,
@@ -45,6 +47,7 @@ const AdminCreateClassRoom = () => {
     setTeacherId("");
     setSubject("");
     setSession("");
+    setQuery("");
   };
 
   return (
@@ -53,6 +56,7 @@ const AdminCreateClassRoom = () => {
         Create New Class
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Class Name */}
         <div>
           <label
             htmlFor="name"
@@ -76,6 +80,8 @@ const AdminCreateClassRoom = () => {
             <option value="Fifth Year">Fifth Year</option>
           </select>
         </div>
+
+        {/* Searchable Teacher Selection */}
         <div>
           <label
             htmlFor="teacher"
@@ -83,24 +89,43 @@ const AdminCreateClassRoom = () => {
           >
             Teacher
           </label>
-          <select
+          <input
+            type="text"
             id="teacher"
-            name="teacher_id"
-            value={teacherId}
-            onChange={(e) => setTeacherId(e.target.value)}
-            required
+            placeholder="Search for a teacher..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             className="mt-1 block w-full h-12 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-lg"
-          >
-            <option value="">Select a teacher</option>
-            {!isLoading &&
-              !isError &&
-              data.accounts.map((teacher) => (
-                <option key={teacher.id} value={teacher.id}>
+          />
+          <ul className="mt-2 max-h-40 overflow-y-auto border border-gray-300 rounded-md bg-white">
+            {isLoading ? (
+              <li className="p-2 text-gray-500">Loading...</li>
+            ) : isError ? (
+              <li className="p-2 text-red-500">Failed to load teachers.</li>
+            ) : teachers?.length ? (
+              teachers.map((teacher) => (
+                <li
+                  key={teacher.id}
+                  className={`p-2 cursor-pointer  ${
+                    teacher.id === teacherId
+                      ? "bg-blue-500 text-white" // Apply blue background and white text for selected
+                      : "hover:bg-gray-200"
+                  }`}
+                  onClick={() => {
+                    setTeacherId(teacher.id); // Set teacher ID
+                    setQuery(teacher.name); // Show selected teacher name
+                  }}
+                >
                   {teacher.name}
-                </option>
-              ))}
-          </select>
+                </li>
+              ))
+            ) : (
+              <li className="p-2 text-gray-500">No teachers found.</li>
+            )}
+          </ul>
         </div>
+
+        {/* Subject */}
         <div>
           <label
             htmlFor="subject"
@@ -118,6 +143,8 @@ const AdminCreateClassRoom = () => {
             className="mt-1 block w-full h-12 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-lg"
           />
         </div>
+
+        {/* Session */}
         <div>
           <label
             htmlFor="session"
@@ -136,11 +163,13 @@ const AdminCreateClassRoom = () => {
             className="mt-1 block w-full h-12 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-lg"
           />
         </div>
+
+        {/* Submit Button */}
         <div className="flex justify-end">
           <button
             type="submit"
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            disabled={mutation.isLoading}
+            disabled={mutation.isLoading || !teacherId}
           >
             {mutation.isLoading ? "Creating..." : "Create"}
           </button>

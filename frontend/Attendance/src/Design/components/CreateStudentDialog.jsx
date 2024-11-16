@@ -88,7 +88,7 @@ const CreateStudentDialog = () => {
                       setQuery(student.name); // Optionally set query to selected student's name
                     }}
                   >
-                    {student.name}
+                    {student.name} - {student.roleNumber}
                   </li>
                 ))
               )}

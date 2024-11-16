@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
-import useAccountsByRole from "@/Hooks/Accounts/useAccountsByRole ";
 import { useParams, useNavigate } from "react-router-dom";
 import useClassroomById from "@/Hooks/Classrooms/useClassroomById";
-
+import useTeachersByName from "@/Hooks/Accounts/useTeachersByName";
 const updateClassroom = async (id, classroomData) => {
   const response = await axiosInstance.put(`/classrooms/${id}`, classroomData);
   return response.data;
@@ -16,6 +15,7 @@ const AdminUpdateClassRoom = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [query, setQuery] = useState("");
 
   // Fetch classroom data using the custom hook
   const {
@@ -24,17 +24,18 @@ const AdminUpdateClassRoom = () => {
     isLoading: isClassroomLoading,
   } = useClassroomById(id);
 
-  // Fetch teacher data
+  // Fetch teachers with role "teacher"
   const {
     data: teachersData,
     isError: isTeachersError,
     isLoading: isTeachersLoading,
-  } = useAccountsByRole("teacher");
+  } = useTeachersByName(query);
 
   const [name, setName] = useState("");
   const [teacherId, setTeacherId] = useState("");
   const [subject, setSubject] = useState("");
   const [session, setSession] = useState("");
+  // For searchable teacher input
 
   // Initialize state with classroom data when available
   useEffect(() => {
@@ -43,6 +44,7 @@ const AdminUpdateClassRoom = () => {
       setTeacherId(classroom.teacher_id);
       setSubject(classroom.subject);
       setSession(classroom.session);
+      setQuery(classroom.teacher.name);
     }
   }, [classroom]);
 
@@ -69,7 +71,7 @@ const AdminUpdateClassRoom = () => {
     mutation.mutate({ name, teacher_id: teacherId, subject, session });
   };
 
-  if (isClassroomLoading || isTeachersLoading) {
+  if (isClassroomLoading) {
     return <div>Loading...</div>;
   }
 
@@ -84,7 +86,7 @@ const AdminUpdateClassRoom = () => {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-md shadow-md">
       <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-        Update Class Details {id}
+        Update Class Details
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -110,6 +112,7 @@ const AdminUpdateClassRoom = () => {
             <option value="Fifth Year">Fifth Year</option>
           </select>
         </div>
+        {/* Teacher Searchable Input */}
         <div>
           <label
             htmlFor="teacher"
@@ -117,23 +120,40 @@ const AdminUpdateClassRoom = () => {
           >
             Teacher
           </label>
-          <select
+          <input
+            type="text"
             id="teacher"
-            name="teacher_id"
-            value={teacherId}
-            onChange={(e) => setTeacherId(e.target.value)}
-            required
+            placeholder="Search for a teacher..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             className="mt-1 block w-full h-12 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-lg"
-          >
-            <option value="">Select a teacher</option>
-            {!isTeachersLoading &&
-              !isTeachersError &&
-              teachersData.accounts.map((teacher) => (
-                <option key={teacher.id} value={teacher.id}>
+          />
+          <ul className="mt-2 max-h-40 overflow-y-auto border border-gray-300 rounded-md bg-white">
+            {isTeachersLoading ? (
+              <li className="p-2 text-gray-500">Loading...</li>
+            ) : isTeachersError ? (
+              <li className="p-2 text-red-500">Failed to load teachers.</li>
+            ) : teachersData?.length ? (
+              teachersData.map((teacher) => (
+                <li
+                  key={teacher.id}
+                  className={`p-2 cursor-pointer  ${
+                    teacher.id === teacherId
+                      ? "bg-blue-500 text-white" // Apply blue background and white text for selected
+                      : "hover:bg-gray-200"
+                  }`}
+                  onClick={() => {
+                    setTeacherId(teacher.id); // Set teacher ID
+                    setQuery(teacher.name); // Show selected teacher name
+                  }}
+                >
                   {teacher.name}
-                </option>
-              ))}
-          </select>
+                </li>
+              ))
+            ) : (
+              <li className="p-2 text-gray-500">No teachers found.</li>
+            )}
+          </ul>
         </div>
         <div>
           <label
@@ -174,7 +194,7 @@ const AdminUpdateClassRoom = () => {
           <button
             type="submit"
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            disabled={mutation.isLoading}
+            disabled={mutation.isLoading || !teacherId}
           >
             {mutation.isLoading ? "Updating..." : "Update"}
           </button>

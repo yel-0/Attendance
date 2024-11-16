@@ -29,7 +29,7 @@ class AccountController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'student',  // Default role if not provided
+            'role' => $request->role ?? 'student', 
             'roleNumber' => $request->roleNumber,
         ]);
     
@@ -127,18 +127,35 @@ public function index(Request $request)
         ]);
     }
 
-    public function findByRoleAndRoleNumber($roleNumber)
+    public function filterTeachersByName(Request $request)
 {
-    $accounts = Account::where('role', 'student')
-                        ->where('roleNumber', 'like', '%' . $roleNumber . '%')
-                        ->get();
+    $name = $request->query('name', ''); // Get the 'name' query parameter
 
-    if ($accounts->isEmpty()) {
-        return response()->json([], 200);
-    }
+    // Find teachers whose names match the query, limit to 5 results
+    $teachers = Account::where('role', 'teacher')
+        ->where('name', 'LIKE', "%{$name}%")
+        ->take(5)
+        ->get();
 
-    return response()->json($accounts, 200);
+    return response()->json([
+        'teachers' => $teachers
+    ]);
 }
+
+    public function findByRoleAndRoleNumber($roleNumber)
+    {
+        $accounts = Account::where('role', 'student')
+                            ->where('roleNumber', 'like', '%' . $roleNumber . '%')
+                            ->limit(5)  // Limit the results to 2
+                            ->get();
+    
+        if ($accounts->isEmpty()) {
+            return response()->json([], 200);
+        }
+    
+        return response()->json($accounts, 200);
+    }
+    
 
 public function update(Request $request, $id)
 {

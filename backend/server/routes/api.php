@@ -17,6 +17,8 @@ Route::middleware(['auth:api', 'check.admin'])->get('/accounts', [AccountControl
 Route::middleware(['auth:api', 'check.admin'])->get('/accounts/role/{role}', [AccountController::class, 'getAccountsByRole']);
 Route::middleware(['auth:api', 'check.admin'])->get('/accounts/students/{roleNumber}', [AccountController::class, 'findByRoleAndRoleNumber']);
 Route::middleware(['auth:api', 'check.admin'])->put('/accounts/{id}', [AccountController::class, 'update']);
+Route::middleware(['auth:api', 'check.admin'])->get('/accounts/teachers/filter', [AccountController::class, 'filterTeachersByName']);
+
 Route::middleware(['auth:api', 'check.admin'])->delete('/accounts/{id}', [AccountController::class, 'destroy']);
 Route::get('/account/info', [AccountController::class, 'getUserInfo']);
 
