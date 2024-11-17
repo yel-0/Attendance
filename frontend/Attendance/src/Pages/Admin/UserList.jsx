@@ -12,6 +12,7 @@ import useAccounts from "@/Hooks/Accounts/useAccounts";
 import { Button } from "@/components/ui/button";
 import DeleteAccountDialog from "@/Design/components/DeleteAccountDialog";
 import UpdateAccountDialog from "@/Design/components/UpdateAccountDialog";
+import FileUpload from "@/Design/components/FileUpload";
 
 const UserList = () => {
   const [role, setRole] = useState(""); // Role filter
@@ -89,6 +90,7 @@ const UserList = () => {
             Filter
           </button>
         </div>
+        <FileUpload />
       </div>
 
       {/* Accounts Table */}

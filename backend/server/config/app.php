@@ -28,6 +28,7 @@ return [
     | services the application utilizes. Set this in your ".env" file.
     |
     */
+    
 
     'env' => env('APP_ENV', 'production'),
 
@@ -43,6 +44,19 @@ return [
     */
 
     'debug' => (bool) env('APP_DEBUG', false),
+
+   
+
+    /*
+    |--------------------------------------------------------------------------
+    | Class Aliases
+    |--------------------------------------------------------------------------
+    */
+    'aliases' => [
+        'App' => Illuminate\Support\Facades\App::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        // Other aliases...
+    ],
 
     /*
     |--------------------------------------------------------------------------

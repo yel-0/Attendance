@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Account;
+use App\Imports\AccountsImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AccountController extends Controller
 {
@@ -41,6 +43,27 @@ class AccountController extends Controller
             'account' => $account,
             'token' => $token,
         ], 201);
+    }
+
+    public function uploadExcel(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls|max:2048',
+        ]);
+
+        // Import the Excel data
+        try {
+            Excel::import(new AccountsImport, $request->file('file'));
+
+            return response()->json([
+                'message' => 'File imported successfully.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error importing file: ' . $e->getMessage(),
+            ], 500);
+        }
     }
     
 
@@ -118,7 +141,7 @@ public function index(Request $request)
 
 
 
-    public function getAccountsByRole($role)
+public function getAccountsByRole($role)
     {
         $accounts = Account::where('role', $role)->get();
 
@@ -127,7 +150,7 @@ public function index(Request $request)
         ]);
     }
 
-    public function filterTeachersByName(Request $request)
+public function filterTeachersByName(Request $request)
 {
     $name = $request->query('name', ''); // Get the 'name' query parameter
 

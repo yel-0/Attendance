@@ -1,16 +1,18 @@
 <?php
 
 use App\Http\Controllers\AccountController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\ClassTimeController;
 use App\Http\Middleware\JwtAuthenticate;
 use App\Http\Controllers\AttendanceController;
+use Illuminate\Support\Facades\Route;
+
 
 
 
 Route::post('/register', [AccountController::class, 'register']);
+Route::post('/upload-excel', [AccountController::class, 'uploadExcel']);
 
 Route::post('/login', [AccountController::class, 'login']);
 Route::middleware(['auth:api', 'check.admin'])->get('/accounts', [AccountController::class, 'index']);
