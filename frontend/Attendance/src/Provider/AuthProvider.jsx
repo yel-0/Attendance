@@ -7,7 +7,6 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
-    // Retrieve token from localStorage on initial load
     const tokenData = JSON.parse(localStorage.getItem("token"));
     return tokenData && tokenData.expiresAt > new Date().getTime()
       ? tokenData.value
@@ -31,7 +30,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = (tokenValue) => {
-    const expirationTime = new Date().getTime() + 3 * 60 * 60 * 1000; // Set token expiry to 3 hours
+    const expirationTime = new Date().getTime() + 3 * 60 * 60 * 1000;
     const tokenData = {
       value: tokenValue,
       expiresAt: expirationTime,

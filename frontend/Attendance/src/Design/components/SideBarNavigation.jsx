@@ -55,6 +55,7 @@ const SideBarNavigation = () => {
               <span>Home</span>
             </Link>
           </li>
+          {isLoading ? <div>Loading...</div> : null}
 
           {/* Show Classes if role is Teacher */}
           {role === "teacher" && (

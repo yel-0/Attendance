@@ -11,6 +11,7 @@ import { useAuth } from "@/Provider/AuthProvider";
 
 const NavBar = () => {
   const { data, isLoading } = useAuth();
+
   const user = data?.user;
   const location = useLocation();
 
@@ -37,6 +38,8 @@ const NavBar = () => {
       )}
 
       <ul>
+        {isLoading ? <div>Loading...</div> : null}
+
         {user ? (
           <li className="flex flex-row justify-center gap-4 items-center space-x-2">
             <div className="flex flex-col items-start">
