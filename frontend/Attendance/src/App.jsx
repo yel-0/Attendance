@@ -36,7 +36,15 @@ function App() {
         <AuthLayout>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route
+              path="/register"
+              element={
+                <ProtectedRoute
+                  element={<Register />}
+                  allowedRoles={["admin"]}
+                />
+              }
+            />
           </Routes>
         </AuthLayout>
       ) : (

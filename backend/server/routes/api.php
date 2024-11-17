@@ -31,7 +31,7 @@ Route::middleware(['auth:api', 'check.admin'])->group(function () {
     Route::get('/classrooms', [ClassroomController::class, 'index']);
     Route::get('/classrooms/{id}', [ClassroomController::class, 'getClassRoomById']);
 });
-Route::middleware(['auth:api'])->get('/classrooms/teacher', [ClassroomController::class, 'getClassroomsByTeacherId']);
+Route::middleware(['auth:api'])->get('/teacher/classrooms', [ClassroomController::class, 'getClassroomsByTeacherId']);
 Route::middleware(['auth:api'])->get('/classrooms/name/{name}', [ClassroomController::class, 'getClassroomsByName']);
 
 
@@ -56,7 +56,7 @@ Route::middleware('auth:api')->group(function () {
     // Get a specific student-class association by ID
     Route::get('/student-classes/{id}', [StudentClassController::class, 'showByClassroomId']);
 
-    Route::get('/classrooms/my-classrooms', [StudentClassController::class, 'getClassroomsByAuthStudent']);
+    Route::get('/my-classrooms/classrooms', [StudentClassController::class, 'getClassroomsByAuthStudent']);
 });
 
 

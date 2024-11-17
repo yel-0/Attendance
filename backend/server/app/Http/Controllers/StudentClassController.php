@@ -12,6 +12,8 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 
 
 class StudentClassController extends Controller
@@ -145,10 +147,11 @@ class StudentClassController extends Controller
 
        public function getClassroomsByAuthStudent(Request $request)
     {
-        // Get the authenticated user
-        $user = Auth::user();
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-        // Assuming the authenticated user is a student and has an ID
         $studentId = $user->id;
 
         // Fetch classroom IDs associated with the authenticated student's ID

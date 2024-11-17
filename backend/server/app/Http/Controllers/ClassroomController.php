@@ -7,6 +7,8 @@ use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 
 class ClassroomController extends Controller
 {
@@ -122,12 +124,28 @@ class ClassroomController extends Controller
      */
     public function getClassroomsByTeacherId(Request $request)
     {
-        $user = Auth::user(); // Get the authenticated user
-        $teacherId = $user->id; // Get the teacher ID from the authenticated user
-
-        $classrooms = Classroom::where('teacher_id', $teacherId)->get();
-
-        return response()->json($classrooms);
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+    
+            $teacherId = $user->id; // Get the teacher ID from the authenticated user
+    
+            $classrooms = Classroom::where('teacher_id', $teacherId)->get();
+    
+            return response()->json($classrooms);
+        } catch (\Exception $e) {
+            // Log the error with additional context
+            Log::error('Error fetching classrooms', [
+                'error_message' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id() ?? 'Not Authenticated',
+            ]);
+    
+            // Return a generic error response
+            return response()->json(['error' => 'An error occurred while fetching classrooms'], 500);
+        }
     }
 
     public function getClassroomsByName($name)

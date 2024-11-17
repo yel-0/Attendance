@@ -40,7 +40,7 @@ const SideBarNavigation = () => {
             to="/"
             className="flex flex-row justify-center items-center gap-3 "
           >
-            <Triangle /> Attendance System
+            <Triangle /> Attendance System {role}
           </Link>
         </div>
       </div>
@@ -55,7 +55,7 @@ const SideBarNavigation = () => {
               <span>Home</span>
             </Link>
           </li>
-          {isLoading ? <div>Loading...</div> : null}
+          {userLoading ? <div>Loading...</div> : null}
 
           {/* Show Classes if role is Teacher */}
           {role === "teacher" && (

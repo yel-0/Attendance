@@ -1,7 +1,7 @@
 import { useQuery } from "react-query";
 import axiosInstance from "@/api/axiosInstance";
 const fetchClassroomsByAuthStudent = async () => {
-  const { data } = await axiosInstance.get("/classrooms/my-classrooms");
+  const { data } = await axiosInstance.get("/my-classrooms/classrooms");
   return data;
 };
 
