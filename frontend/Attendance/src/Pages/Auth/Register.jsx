@@ -3,6 +3,7 @@ import { useMutation } from "react-query";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FileUpload from "@/Design/components/FileUpload";
 
 const registerUser = async (userData) => {
   const response = await axios.post(
@@ -90,6 +91,7 @@ const Register = () => {
               <TabsTrigger value="teacher/admin">
                 Teacher/Admin Registration
               </TabsTrigger>
+              <TabsTrigger value="File">File Registration</TabsTrigger>
             </TabsList>
           </div>
 
@@ -151,6 +153,9 @@ const Register = () => {
               </div>
               <SubmitButton isLoading={isLoading} />
             </form>
+          </TabsContent>
+          <TabsContent value="File">
+            <FileUpload />
           </TabsContent>
         </Tabs>
       </div>

@@ -43,7 +43,7 @@ const FileUpload = () => {
   };
 
   return (
-    <div className=" bg-gray-50 flex items-center justify-center p-6">
+    <div className=" flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">
           Upload Excel File

@@ -12,8 +12,7 @@ import useAccounts from "@/Hooks/Accounts/useAccounts";
 import { Button } from "@/components/ui/button";
 import DeleteAccountDialog from "@/Design/components/DeleteAccountDialog";
 import UpdateAccountDialog from "@/Design/components/UpdateAccountDialog";
-import FileUpload from "@/Design/components/FileUpload";
-
+import { Link } from "react-router-dom";
 const UserList = () => {
   const [role, setRole] = useState(""); // Role filter
   const [rollNumber, setRollNumber] = useState(""); // Roll Number filter
@@ -72,7 +71,6 @@ const UserList = () => {
             <option value="teacher">Teacher</option>
           </select>
         </div>
-
         {/* Filter by Roll Number */}
         <div>
           <label className="mr-2">Filter by Roll Number:</label>
@@ -80,7 +78,7 @@ const UserList = () => {
             type="text"
             value={inputValue} // Use the temporary input value
             onChange={handleInputChange} // Update input value while typing
-            className="px-3 py-2 border border-gray-300 rounded-lg"
+            className="px-3 py-2 mr-3 border border-gray-300 rounded-lg"
             placeholder="Enter Roll Number"
           />
           <button
@@ -90,7 +88,12 @@ const UserList = () => {
             Filter
           </button>
         </div>
-        <FileUpload />
+        <Link
+          to="/register"
+          className="inline-block px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-all"
+        >
+          Register
+        </Link>{" "}
       </div>
 
       {/* Accounts Table */}
