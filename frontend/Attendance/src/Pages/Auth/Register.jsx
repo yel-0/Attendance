@@ -63,6 +63,8 @@ const Register = () => {
       setErrors({ roleNumber: "Roll Number is required for students" });
       return;
     }
+    console.log(formData);
+
     setErrors({});
     mutate(formData);
   };
@@ -80,8 +82,8 @@ const Register = () => {
             setActiveTab(value);
             setFormData((prev) => ({
               ...prev,
-              role: value,
-              roleNumber: value === "teacher/admin" ? "" : prev.roleNumber,
+              role: value === "teacher/admin" ? "teacher" : value,
+              roleNumber: value === "student" ? prev.roleNumber : "",
             }));
           }}
         >
@@ -151,6 +153,7 @@ const Register = () => {
                   <p className="text-red-500 text-sm mt-1">{errors.role}</p>
                 )}
               </div>
+
               <SubmitButton isLoading={isLoading} />
             </form>
           </TabsContent>
