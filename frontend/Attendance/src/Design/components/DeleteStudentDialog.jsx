@@ -24,7 +24,9 @@ const DeleteStudentDialog = ({ student }) => {
     {
       onSuccess: () => {
         toast({
-          title: "Student deleted successfully",
+          title: "Student Deleted Successfully",
+          description:
+            "The student has been removed from the class successfully.",
           variant: "success",
         });
         queryClient.invalidateQueries(["studentClass", classroomId]);
@@ -34,10 +36,10 @@ const DeleteStudentDialog = ({ student }) => {
       onError: (error) => {
         toast({
           variant: "destructive",
-          title: "Error deleting student",
+          title: "Error Deleting Student",
           description: error.response
             ? error.response.data
-            : "An error occurred",
+            : "An error occurred while removing the student from the class. Please try again later.",
         });
       },
     }
@@ -49,7 +51,7 @@ const DeleteStudentDialog = ({ student }) => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
         Delete
       </DialogTrigger>
@@ -63,17 +65,17 @@ const DeleteStudentDialog = ({ student }) => {
         </DialogHeader>
         <div className="mt-4 flex justify-end space-x-4">
           <button
+            className="bg-gray-300 text-black px-4 py-2 rounded-lg hover:bg-gray-400"
+            onClick={() => setOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
             onClick={handleDelete}
             className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
             disabled={deleteMutation.isLoading}
           >
             {deleteMutation.isLoading ? "Deleting..." : "Delete"}
-          </button>
-          <button
-            className="bg-gray-300 text-black px-4 py-2 rounded-lg hover:bg-gray-400"
-            // Add your close dialog logic here if needed
-          >
-            Cancel
           </button>
         </div>
         {deleteMutation.isError && (

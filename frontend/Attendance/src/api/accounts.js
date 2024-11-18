@@ -65,6 +65,7 @@ export const fetchStudentsByRoleNumber = async (roleNumber) => {
 };
 
 // Get accounts by role
+// This is the previous implementation, which is no longer in use.
 export const fetchAccountsByRole = async (role) => {
   const response = await axiosInstance.get(`/accounts/role/${role}`);
   return response.data;

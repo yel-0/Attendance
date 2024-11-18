@@ -44,3 +44,10 @@ export const deleteClassroom = async (id) => {
     throw error.response ? error.response.data : new Error("An error occurred");
   }
 };
+
+// Get classrooms by teacher ID
+// Used in : SideBarNavigation.jsx
+export const fetchTeacherClassrooms = async () => {
+  const response = await axiosInstance.get("/teacher/classrooms");
+  return response.data;
+};

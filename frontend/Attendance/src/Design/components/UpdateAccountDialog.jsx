@@ -29,14 +29,17 @@ const UpdateAccountDialog = ({ account }) => {
       queryClient.invalidateQueries("accounts");
       setIsOpen(false);
       toast({
-        title: `Account Update successfully`,
+        title: "Account Updated Successfully",
+        description: "The account information has been successfully updated.",
       });
     },
     onError: (error) => {
       toast({
         variant: "destructive",
-        title: "Error Updating account",
-        description: error.message || "Something went wrong",
+        title: "Error Updating Account",
+        description:
+          error.message ||
+          "An unexpected error occurred while updating the account. Please try again later.",
       });
     },
   });
