@@ -6,7 +6,6 @@ export const fetchAccounts = async (role, rollNumber, page, limit) => {
     page,
     limit,
   };
-  console.log(params);
 
   const response = await axiosInstance.get("/accounts", { params });
   return response.data;

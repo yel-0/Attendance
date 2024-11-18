@@ -124,9 +124,13 @@ public function index(Request $request)
     }
 
     // Apply roll_number filter if present
+ 
+
     if ($rollNumber) {
-        $query->where('roleNumber', $rollNumber);
+        $query->where('roleNumber', 'like', "%$rollNumber%");
     }
+    
+
 
     // Add pagination logic
     $accounts = $query->paginate($limit, ['*'], 'page', $page);
