@@ -5,10 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useParams, useNavigate } from "react-router-dom";
 import useClassroomById from "@/Hooks/Classrooms/useClassroomById";
 import useTeachersByName from "@/Hooks/Accounts/useTeachersByName";
-const updateClassroom = async (id, classroomData) => {
-  const response = await axiosInstance.put(`/classrooms/${id}`, classroomData);
-  return response.data;
-};
+import { updateClassroom } from "@/api/classrooms";
 
 const AdminUpdateClassRoom = () => {
   const { id } = useParams(); // Get classroom ID from route params
@@ -53,15 +50,19 @@ const AdminUpdateClassRoom = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["classrooms"]);
       toast({
-        title: "Classroom updated successfully",
+        title: "Classroom Updated Successfully",
+        description:
+          "The classroom details have been successfully updated in the system.",
       });
       navigate("/admin/classes");
     },
     onError: (error) => {
       toast({
         variant: "destructive",
-        title: "Error updating class",
-        description: error.message || "Something went wrong",
+        title: "Error Updating Classroom",
+        description:
+          error.message ||
+          "An error occurred while updating the classroom. Please try again later.",
       });
     },
   });

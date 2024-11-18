@@ -43,12 +43,22 @@ Route::middleware(['auth:api', 'check.admin'])->group(function () {
 
 
 Route::middleware(['auth:api', 'check.admin'])->group(function () {
+    // Create a new classroom
     Route::post('/classrooms', [ClassroomController::class, 'store']);
+    
+    // Update an existing classroom by ID
     Route::put('/classrooms/{id}', [ClassroomController::class, 'update']);
+    
+    // Delete a classroom by ID
     Route::delete('/classrooms/{id}', [ClassroomController::class, 'destroy']);
+    
+    // Get a list of all classrooms
     Route::get('/classrooms', [ClassroomController::class, 'index']);
+    
+    // Get a specific classroom by ID
     Route::get('/classrooms/{id}', [ClassroomController::class, 'getClassRoomById']);
 });
+
 Route::middleware(['auth:api'])->get('/teacher/classrooms', [ClassroomController::class, 'getClassroomsByTeacherId']);
 Route::middleware(['auth:api'])->get('/classrooms/name/{name}', [ClassroomController::class, 'getClassroomsByName']);
 

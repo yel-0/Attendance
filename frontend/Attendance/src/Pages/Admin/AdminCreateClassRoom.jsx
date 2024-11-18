@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
 import useTeachersByName from "@/Hooks/Accounts/useTeachersByName";
-const createClassroom = async (classroomData) => {
-  const response = await axiosInstance.post("/classrooms", classroomData);
-  return response.data;
-};
+import { createClassroom } from "@/api/classrooms";
 
 const AdminCreateClassRoom = () => {
   const { toast } = useToast();
@@ -16,7 +12,7 @@ const AdminCreateClassRoom = () => {
   const [teacherId, setTeacherId] = useState("");
   const [subject, setSubject] = useState("");
   const [session, setSession] = useState("");
-  const [query, setQuery] = useState(""); // For teacher search input
+  const [query, setQuery] = useState("");
 
   const { data: teachers, isError, isLoading } = useTeachersByName(query);
 
@@ -25,14 +21,17 @@ const AdminCreateClassRoom = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["classrooms"]);
       toast({
-        title: "Classroom created successfully",
+        title: "Classroom Created",
+        description: "The classroom was successfully added to the system.",
       });
       resetForm();
     },
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Something went wrong",
+        title: "Creation Failed",
+        description:
+          "An error occurred while creating the classroom. Please try again.",
       });
     },
   });

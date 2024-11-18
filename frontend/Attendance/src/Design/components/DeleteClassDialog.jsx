@@ -22,14 +22,17 @@ const DeleteClassDialog = ({ classData }) => {
 
       setOpen(false);
       toast({
-        title: `Class "${classData.name}" deleted successfully`,
+        title: `Class "${classData.name}" Deleted Successfully`,
+        description: `The class "${classData.name}" has been permanently removed from the system.`,
       });
     },
     onError: (error) => {
       toast({
         variant: "destructive",
-        title: "Error deleting class",
-        description: error.message || "Something went wrong",
+        title: "Error Deleting Class",
+        description:
+          error.message ||
+          "An error occurred while trying to delete the class. Please try again later.",
       });
     },
   });

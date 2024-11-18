@@ -1,6 +1,7 @@
 import axiosInstance from "./axiosInstance";
 
 // List all accounts
+// Used in: UserList.jsx
 export const fetchAccounts = async (role, rollNumber, page, limit) => {
   const params = {
     role,
@@ -13,13 +14,8 @@ export const fetchAccounts = async (role, rollNumber, page, limit) => {
   return response.data;
 };
 
-// Get accounts by role
-export const fetchAccountsByRole = async (role) => {
-  const response = await axiosInstance.get(`/accounts/role/${role}`);
-  return response.data;
-};
-
 // Register User
+//Used in : Register.jsx
 export const registerUser = async (userData) => {
   try {
     const response = await axiosInstance.post("/register", userData);
@@ -31,6 +27,7 @@ export const registerUser = async (userData) => {
 };
 
 // Register Users with excel file
+//Use in :File Upload
 export const uploadExcel = (formData) => {
   return axiosInstance.post("/upload-excel", formData, {
     headers: {
@@ -39,18 +36,20 @@ export const uploadExcel = (formData) => {
   });
 };
 
-// Find accounts by student role and role number
-export const fetchStudentsByRoleNumber = async (roleNumber) => {
-  const { data } = await axiosInstance.get(`/accounts/students/${roleNumber}`);
-  return data;
-};
-
 // Update an account
+//Used in :UpdateAccountDialog.jsx
 export const updateAccount = async ({ id, updatedData }) => {
   await axiosInstance.put(`/accounts/${id}`, updatedData);
 };
 
+// Delete an account
+//Use in : DeleteAccountDialog.jsx
+export const deleteAccount = async ({ accountId }) => {
+  await axiosInstance.delete(`/accounts/${accountId}`);
+};
+
 // Filter teachers by name
+// Used in : AdminUpdateClassRoom.jsx
 export const fetchTeachersByName = async (query) => {
   const response = await axiosInstance.get("/accounts/teachers/filter", {
     params: { name: query },
@@ -58,7 +57,15 @@ export const fetchTeachersByName = async (query) => {
   return response.data.teachers;
 };
 
-// Delete an account
-export const deleteAccount = async ({ accountId }) => {
-  await axiosInstance.delete(`/accounts/${accountId}`);
+// Find accounts by student role and role number
+// Used in : CreateStudentDialog.jsx
+export const fetchStudentsByRoleNumber = async (roleNumber) => {
+  const { data } = await axiosInstance.get(`/accounts/students/${roleNumber}`);
+  return data;
+};
+
+// Get accounts by role
+export const fetchAccountsByRole = async (role) => {
+  const response = await axiosInstance.get(`/accounts/role/${role}`);
+  return response.data;
 };

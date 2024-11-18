@@ -28,7 +28,8 @@ const CreateStudentDialog = () => {
     {
       onSuccess: () => {
         toast({
-          title: "Student class created successfully",
+          title: "Student Added to Class Successfully",
+          description: `The student has been successfully added to the class "${classroomId}".`,
         });
         queryClient.invalidateQueries(["studentClass", classroomId]);
         setOpen(false);
@@ -36,8 +37,10 @@ const CreateStudentDialog = () => {
       onError: (error) => {
         toast({
           variant: "destructive",
-          title: "Something went wrong",
-          description: error.message,
+          title: "Error Adding Student to Class",
+          description:
+            error.message ||
+            "An error occurred while adding the student to the class. Please try again later.",
         });
       },
     }
