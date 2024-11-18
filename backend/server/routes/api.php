@@ -10,19 +10,37 @@ use Illuminate\Support\Facades\Route;
 
 
 
-
-Route::post('/register', [AccountController::class, 'register']);
-Route::post('/upload-excel', [AccountController::class, 'uploadExcel']);
-
 Route::post('/login', [AccountController::class, 'login']);
-Route::middleware(['auth:api', 'check.admin'])->get('/accounts', [AccountController::class, 'index']);
-Route::middleware(['auth:api', 'check.admin'])->get('/accounts/role/{role}', [AccountController::class, 'getAccountsByRole']);
-Route::middleware(['auth:api', 'check.admin'])->get('/accounts/students/{roleNumber}', [AccountController::class, 'findByRoleAndRoleNumber']);
-Route::middleware(['auth:api', 'check.admin'])->put('/accounts/{id}', [AccountController::class, 'update']);
-Route::middleware(['auth:api', 'check.admin'])->get('/accounts/teachers/filter', [AccountController::class, 'filterTeachersByName']);
-
-Route::middleware(['auth:api', 'check.admin'])->delete('/accounts/{id}', [AccountController::class, 'destroy']);
 Route::get('/account/info', [AccountController::class, 'getUserInfo']);
+
+
+Route::middleware(['auth:api', 'check.admin'])->group(function () {
+    // List all accounts
+    Route::get('/accounts', [AccountController::class, 'index']);
+    
+    // Register Users with excel file
+    Route::post('/upload-excel', [AccountController::class, 'uploadExcel']);
+
+    // Register User
+    Route::post('/register', [AccountController::class, 'register']);
+ 
+    // Get accounts by role
+    Route::get('/accounts/role/{role}', [AccountController::class, 'getAccountsByRole']);
+    
+    // Find accounts by student role and role number
+    Route::get('/accounts/students/{roleNumber}', [AccountController::class, 'findByRoleAndRoleNumber']);
+    
+    // Update an account
+    Route::put('/accounts/{id}', [AccountController::class, 'update']);
+    
+    // Filter teachers by name
+    Route::get('/accounts/teachers/filter', [AccountController::class, 'filterTeachersByName']);
+    
+    // Delete an account
+    Route::delete('/accounts/{id}', [AccountController::class, 'destroy']);
+});
+
+
 
 Route::middleware(['auth:api', 'check.admin'])->group(function () {
     Route::post('/classrooms', [ClassroomController::class, 'store']);

@@ -1,17 +1,9 @@
 import React, { useState } from "react";
 import { useMutation } from "react-query";
-import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "@/Design/components/FileUpload";
-
-const registerUser = async (userData) => {
-  const response = await axios.post(
-    "http://127.0.0.1:8000/api/register",
-    userData
-  );
-  return response.data;
-};
+import { registerUser } from "@/api/accounts";
 
 const Register = () => {
   const { toast } = useToast();

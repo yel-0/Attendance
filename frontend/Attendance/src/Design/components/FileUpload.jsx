@@ -1,27 +1,31 @@
 import React, { useState } from "react";
 import { useMutation } from "react-query";
-import axios from "axios";
+import { uploadExcel } from "@/api/accounts";
+import { useToast } from "@/components/ui/use-toast";
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
+  const { toast } = useToast();
 
   // Mutation for uploading file
-  const uploadMutation = useMutation(
-    (formData) =>
-      axios.post("http://localhost:8000/api/upload-excel", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }),
-    {
-      onSuccess: (response) => {
-        alert("success");
-      },
-      onError: (error) => {
-        alert("error");
-      },
-    }
-  );
+  const uploadMutation = useMutation(uploadExcel, {
+    onSuccess: (response) => {
+      toast({
+        title: "Accounts Registered Successfully",
+        description:
+          "The accounts from the uploaded Excel file have been registered into the system.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error Registering Accounts",
+        description:
+          error.message ||
+          "There was an issue processing the uploaded Excel file. Please try again.",
+      });
+    },
+  });
 
   // Handle file input change
   const handleFileChange = (e) => {

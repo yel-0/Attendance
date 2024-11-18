@@ -8,24 +8,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
-
+import { deleteAccount } from "@/api/accounts";
 const DeleteAccountDialog = ({ accountId, accountName }) => {
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const deleteAccount = async () => {
-    await axiosInstance.delete(`/accounts/${accountId}`);
-  };
-
   const mutation = useMutation(deleteAccount, {
     onSuccess: () => {
       queryClient.invalidateQueries("accounts");
       toast({
-        title: `Delete successful`,
+        title: "Account Deleted Successfully",
+        description: `The account "${accountName}" has been permanently removed from the system.`,
       });
+
       setIsOpen(false);
     },
     onError: (error) => {
@@ -38,7 +35,7 @@ const DeleteAccountDialog = ({ accountId, accountName }) => {
   });
 
   const handleDelete = () => {
-    mutation.mutate();
+    mutation.mutate({ accountId });
   };
 
   return (

@@ -12,9 +12,11 @@ const Attendance = () => {
 
   return (
     <div>
-      {/* <div className="text-center capitalize text-black  text-2xl font-semibold p-4">
-        {studentClass.classroom.name}
-      </div> */}
+      <div className="text-start capitalize text-black  text-2xl font-semibold p-4">
+        {`${studentClass?.classroom?.name || ""} ${
+          studentClass?.classroom?.subject || ""
+        } ${studentClass?.classroom?.session || ""}`}
+      </div>
 
       <AttendanceStudent studentClass={studentClass} />
     </div>

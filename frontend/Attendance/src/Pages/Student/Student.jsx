@@ -27,8 +27,12 @@ const Student = () => {
   const students = studentClass?.students || []; // Adjust based on your data structure
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Students</h2>
-      <div className="flex flex-row justify-end mb-2 w-full">
+      <h2 className="text-2xl font-bold mb-4">
+        {`${studentClass?.classroom?.name || ""} ${
+          studentClass?.classroom?.subject || ""
+        } ${studentClass?.classroom?.session || ""}`}
+      </h2>
+      <div className="flex flex-row gap-4 justify-end mb-2 w-full">
         <CreateStudentDialog />
         <ImportStudentClassDialog />
       </div>

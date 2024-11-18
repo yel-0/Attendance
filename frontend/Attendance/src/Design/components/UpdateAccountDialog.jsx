@@ -8,8 +8,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
+import { updateAccount } from "@/api/accounts";
 
 const UpdateAccountDialog = ({ account }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,10 +23,6 @@ const UpdateAccountDialog = ({ account }) => {
   });
 
   const queryClient = useQueryClient();
-
-  const updateAccount = async (updatedData) => {
-    await axiosInstance.put(`/accounts/${account.id}`, updatedData);
-  };
 
   const mutation = useMutation(updateAccount, {
     onSuccess: () => {
@@ -52,7 +48,10 @@ const UpdateAccountDialog = ({ account }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutation.mutate(formData);
+    mutation.mutate({
+      id: account.id,
+      updatedData: formData,
+    });
   };
 
   return (
