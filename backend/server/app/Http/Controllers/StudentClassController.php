@@ -13,6 +13,10 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Imports\StudentClassImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
+
 
 
 
@@ -58,6 +62,115 @@ class StudentClassController extends Controller
     
         return response()->json($studentClass, Response::HTTP_CREATED);
     }
+
+
+    public function importExcel(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,csv|max:2048', // Validate file type and size
+        ]);
+    
+        try {
+            // Load the file into a collection
+            $rows = Excel::toCollection(null, $request->file('file'))[0];
+    
+            // Extract student_id and classroom_id values from the file
+            $studentIds = $rows->pluck(0); // Assuming student_id is in the first column
+            $classroomIds = $rows->pluck(1); // Assuming classroom_id is in the second column
+    
+            // Check for duplicate student_id values in the file
+            if ($studentIds->duplicates()->isNotEmpty()) {
+                return response()->json([
+                    'message' => 'Duplicate student_id values found in the file.',
+                ], 422);
+            }
+    
+            $errors = []; // To store errors for failed rows
+    
+            // Start a database transaction
+            DB::beginTransaction();
+    
+            // Check if student_id and classroom_id exist in the database
+            foreach ($rows as $index => $row) {
+                try {
+                    $studentId = $row[0];
+                    $classroomId = $row[1];
+    
+                    // Validate if student_id and classroom_id exist in the database
+                    $studentExists = Account::find($studentId);
+                    $classroomExists = Classroom::find($classroomId);
+    
+                    if (!$studentExists || !$classroomExists) {
+                        $errors[] = "Row {$index}: Invalid student_id or classroom_id.";
+                        continue; // Skip to the next row
+                    }
+    
+                    // Check if the student is already associated with the classroom
+                    $exists = StudentClass::where('student_id', $studentId)
+                                          ->where('classroom_id', $classroomId)
+                                          ->exists();
+    
+                    if ($exists) {
+                        $errors[] = "Row {$index}: The student with ID {$studentId} is already associated with classroom {$classroomId}.";
+                        continue; // Skip to the next row
+                    }
+    
+                    // Create the student-class association
+                    StudentClass::create([
+                        'student_id' => $studentId,
+                        'classroom_id' => $classroomId,
+                    ]);
+    
+                    // Add attendance records for the new student
+                    $classTimes = ClassTime::where('classroom_id', $classroomId)->get();
+    
+                    foreach ($classTimes as $classTime) {
+                        // Create attendance record if it doesn't exist
+                        Attendance::firstOrCreate([
+                            'student_id' => $studentId,
+                            'class_time_id' => $classTime->id,
+                        ], [
+                            'attended' => false, 
+                        ]);
+                    }
+    
+                } catch (\Exception $e) {
+                    // Capture any other exceptions and add them to the errors array
+                    $errors[] = "Row {$index}: Error processing this row - " . $e->getMessage();
+                    continue; // Skip to the next row
+                }
+            }
+    
+            // If there are any errors, rollback the transaction
+            if (!empty($errors)) {
+                DB::rollBack();  // Rollback all changes if there's an error
+                return response()->json([
+                    'message' => 'Some rows encountered errors.',
+                    'errors' => $errors,
+                ], 422);
+            }
+    
+            // If everything is fine, commit the transaction
+            DB::commit();
+    
+            // Return success response if no errors
+            return response()->json([
+                'message' => 'Student classes imported successfully.',
+            ], 201);
+    
+        } catch (\Throwable $e) {
+            // Handle any errors and return response
+            DB::rollBack();  // Rollback the transaction in case of any unexpected errors
+            return response()->json([
+                'message' => 'An error occurred while importing the file.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+    
+
     
 
     // Method to remove a student from a classroom

@@ -46,6 +46,8 @@ Route::middleware(['auth:api', 'check.admin'])->group(function () {
     
     // Delete a student-class association
     Route::delete('/student-classes/{id}', [StudentClassController::class, 'destroy']);
+
+    Route::post('/import-student-classes', [StudentClassController::class, 'importExcel']);
 });
 
 // Public routes to get all student-class associations and specific ones by ID
