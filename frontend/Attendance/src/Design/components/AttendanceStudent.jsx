@@ -17,7 +17,7 @@ import { useAttendancesByClassTimes } from "@/Hooks/Attendances/useAttendancesBy
 import { useUpdateAttendanceRecords } from "@/Hooks/Attendances/useUpdateAttendanceRecords ";
 import { useToast } from "@/components/ui/use-toast";
 import DeleteSessionDialog from "./DeleteSessionDialog";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 
 const formatDate = (date) => {
   if (!date) return null;
@@ -28,12 +28,27 @@ const formatDate = (date) => {
 };
 
 const AttendanceStudent = ({ studentClass }) => {
+  const { year, month, day } = useParams();
   const [date, setDate] = useState(null);
   const [attendanceRecords, setAttendanceRecords] = useState({});
   const updateAttendanceMutation = useUpdateAttendanceRecords();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { classId } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (year && month && day) {
+      setDate(new Date(`${year}-${month}-${day}`));
+    } else {
+      const today = new Date();
+      navigate(
+        `/attendance/${today.getFullYear()}/${String(
+          today.getMonth() + 1
+        ).padStart(2, "0")}/${String(today.getDate()).padStart(2, "0")}`
+      );
+    }
+  }, [year, month, day, navigate]);
 
   const {
     data: classTimes,
@@ -82,6 +97,17 @@ const AttendanceStudent = ({ studentClass }) => {
     }));
   };
 
+  const handleCheckAll = (slotId, attended) => {
+    setAttendanceRecords((prevRecords) => {
+      const newRecords = { ...prevRecords };
+      studentClass.students.forEach((student) => {
+        const key = `${student.student.id}-${slotId}`;
+        newRecords[key] = { attended, slotId };
+      });
+      return newRecords;
+    });
+  };
+
   const mutation = useMutation(createAttendances, {
     onSuccess: (data) => {
       console.log("Successfully created attendance records:", data);
@@ -110,12 +136,19 @@ const AttendanceStudent = ({ studentClass }) => {
       onSuccess: (data) => {
         queryClient.invalidateQueries(["attendances", classTimeIds]);
         toast({
-          title: "Attendance records updated successfully",
+          title: "Attendance Records Updated",
+          description: `${data.updatedCount} attendance records have been successfully updated.`,
+          status: "success",
         });
       },
       onError: (error) => {
-        // Handle error (e.g., show an error message)
-        console.error("Error updating attendance records", error);
+        toast({
+          variant: "destructive",
+          title: "Error Updating Attendance Records",
+          description:
+            error.response?.data?.message ||
+            "An unexpected error occurred while updating attendance records. Please try again.",
+        });
       },
     });
   };
@@ -147,7 +180,7 @@ const AttendanceStudent = ({ studentClass }) => {
           <CreateSessionDialog classId={classId} mydate={formatDate(date)} />
         </div>
 
-        <DatePickerDemo date={date} setDate={setDate} />
+        <DatePickerDemo />
       </div>
       <form onSubmit={handleSubmit}>
         <Table className=" border p-5 bg-white shadow">
@@ -166,6 +199,15 @@ const AttendanceStudent = ({ studentClass }) => {
                     sessionId={slot.id}
                     mydate={formatDate(date)}
                   />
+                  <div className="flex justify-center">
+                    <input
+                      type="checkbox"
+                      onChange={(e) =>
+                        handleCheckAll(slot.id, e.target.checked)
+                      }
+                      className="transform scale-150 accent-blue"
+                    />
+                  </div>
                 </TableHead>
               ))}
             </TableRow>
@@ -212,11 +254,6 @@ const AttendanceStudent = ({ studentClass }) => {
           </button>
           {mutation.isError && (
             <div className="text-red-500 mt-2">{mutation.error.message}</div>
-          )}
-          {mutation.isSuccess && (
-            <div className="text-green-500 mt-2">
-              Attendance records created successfully!
-            </div>
           )}
         </div>
       </form>

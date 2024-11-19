@@ -18,3 +18,16 @@ export const createClassTime = async (classTimeData) => {
   );
   return response.data;
 };
+
+// API function for deleting a session
+export const deleteSessionApi = async (sessionId) => {
+  try {
+    const response = await axiosInstance.delete(`/class-times/${sessionId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+        "An unexpected error occurred while deleting the session."
+    );
+  }
+};

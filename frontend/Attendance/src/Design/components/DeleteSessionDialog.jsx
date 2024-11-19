@@ -8,9 +8,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
 import { useParams } from "react-router-dom";
+import { deleteSessionApi } from "@/api/classtime";
 
 const DeleteSessionDialog = ({ time, sessionId, mydate }) => {
   const queryClient = useQueryClient();
@@ -18,32 +18,25 @@ const DeleteSessionDialog = ({ time, sessionId, mydate }) => {
   const { classId } = useParams();
   const [open, setOpen] = useState(false);
 
-  const deleteSession = async (sessionId) => {
-    try {
-      await axiosInstance.delete(`/class-times/${sessionId}`);
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Error deleting session"
-      );
-    }
-  };
-
-  const mutation = useMutation(deleteSession, {
+  const mutation = useMutation(deleteSessionApi, {
     onSuccess: () => {
       toast({
-        title: "Session deleted successfully",
+        title: "Session Deleted",
+        description: "The session has been successfully removed.",
       });
-      // queryClient.refetchQueries(["classTimes", classId, mydate]);
+      queryClient.invalidateQueries(["classTimes", classId, mydate]);
+      window.location.reload();
       setOpen(false);
     },
     onError: (error) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message,
+        title: "Failed to Delete Session",
+        description: `Error: ${error.message}. Please try again.`,
       });
     },
   });
+
   const handleDelete = () => {
     mutation.mutate(sessionId);
   };
@@ -65,7 +58,7 @@ const DeleteSessionDialog = ({ time, sessionId, mydate }) => {
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             disabled={mutation.isLoading}
           >
-            Delete
+            {mutation.isLoading ? "Deleting..." : "Delete"}
           </button>
         </div>
       </DialogContent>

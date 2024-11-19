@@ -28,21 +28,35 @@ class ClassTimeController extends Controller
                 'start_time' => 'required|date_format:H:i',
                 'end_time' => 'required|date_format:H:i|after:start_time',
             ]);
-        
+    
             if ($validator->fails()) {
                 Log::error('Validation errors: ' . json_encode($validator->errors()));
                 return response()->json(['errors' => $validator->errors()], 422);
             }
+    
+            // Step 2: Check for duplicate class times
+            $duplicateCheck = ClassTime::where('classroom_id', $request->classroom_id)
+            ->where('session_date', $request->session_date)
+            ->where('start_time', $request->start_time)
+            ->where('end_time', $request->end_time)
+            ->exists();
         
-            // Step 2: Create the ClassTime
+        if ($duplicateCheck) {
+            return response()->json([
+                'error' => 'A class time with the same start and end time already exists for this classroom on the same day.'
+            ], 409);
+        }
+        
+    
+            // Step 3: Create the ClassTime
             $classTime = ClassTime::create($request->all());
-        
-            // Step 3: Retrieve all students associated with the classroom_id
+    
+            // Step 4: Retrieve all students associated with the classroom_id
             $students = DB::table('student_classes')
                 ->where('classroom_id', $request->classroom_id)
                 ->pluck('student_id');
-        
-            // Step 4: Create attendance records for each student
+    
+            // Step 5: Create attendance records for each student
             foreach ($students as $studentId) {
                 DB::table('attendances')->insert([
                     'student_id' => $studentId,
@@ -52,20 +66,21 @@ class ClassTimeController extends Controller
                     'updated_at' => now(),
                 ]);
             }
-        
+    
             return response()->json($classTime, 201);
-
+    
         } catch (\Exception $e) {
             // Catch any exception and log the error
             Log::error('Error storing class time: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all(),
             ]);
-        
+    
             // Return a response with a generic error message
             return response()->json(['error' => 'An error occurred while creating the class time.'], 500);
         }
     }
+    
 
     
 

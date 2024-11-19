@@ -23,15 +23,17 @@ const CreateSessionDialog = ({ classId, mydate }) => {
   const mutation = useMutation(createClassTime, {
     onSuccess: () => {
       toast({
-        title: "Class time created successfully",
+        title: "Class Time Created",
+        description: "The class time was successfully added.",
       });
       queryClient.invalidateQueries(["classTimes", classId, mydate]);
+      window.location.reload();
     },
     onError: (error) => {
       toast({
         variant: "destructive",
-        title: "Error creating class time",
-        description: JSON.stringify(error.message), // Display more detailed error
+        title: "Failed to Create Class Time",
+        description: `An error occurred: ${error.message}. Please try again or contact support if the issue persists.`,
       });
     },
   });

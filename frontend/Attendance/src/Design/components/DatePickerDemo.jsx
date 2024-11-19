@@ -1,49 +1,53 @@
-import React, { useState, useEffect } from "react";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarIcon } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
-const DatePickerDemo = ({ date, setDate }) => {
-  const [open, setOpen] = useState(false);
+const DatePickerDemo = () => {
+  const {
+    year: pickYear,
+    month: pickMonth,
+    day: pickDay,
+    classId,
+  } = useParams();
+  const [selectedDate, setSelectedDate] = useState("");
+  const navigate = useNavigate();
 
+  // Set initial value for the date input based on URL params or today's date
   useEffect(() => {
-    if (!date) {
-      setDate(new Date());
+    if (pickYear && pickMonth && pickDay) {
+      setSelectedDate(
+        `${pickYear}-${String(pickMonth).padStart(2, "0")}-${String(
+          pickDay
+        ).padStart(2, "0")}`
+      );
+    } else {
+      const today = new Date();
+      setSelectedDate(
+        `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(today.getDate()).padStart(2, "0")}`
+      );
     }
-  }, [date, setDate]);
+  }, [pickYear, pickMonth, pickDay]);
 
-  const handleDateSelect = (selectedDate) => {
-    setDate(selectedDate);
-    setOpen(false);
+  // Handle date change and navigate to the corresponding URL
+  const handleDateChange = (event) => {
+    const selectedDate = event.target.value;
+    setSelectedDate(selectedDate);
+
+    const [year, month, day] = selectedDate.split("-");
+    navigate(`/attendance/${classId}/${year}/${month}/${day}`);
   };
 
   return (
     <div>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <button
-            className="flex items-center space-x-2 w-[280px] px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            onClick={() => setOpen(true)}
-          >
-            <CalendarIcon className="h-5 w-5 text-gray-500" />
-            <span className="text-gray-700 font-medium">
-              {date ? date.toDateString() : "Pick a date"}
-            </span>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleDateSelect}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
+      <input
+        id="datePicker"
+        type="date"
+        className="w-[280px] px-4 py-2 border border-gray-300 rounded-lg"
+        onChange={handleDateChange}
+        value={selectedDate}
+      />
     </div>
   );
 };

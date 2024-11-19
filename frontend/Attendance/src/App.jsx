@@ -89,7 +89,7 @@ function App() {
                 }
               />
               <Route
-                path="/attendance/:classId"
+                path="/attendance/:classId/:year/:month/:day"
                 element={
                   <ProtectedRoute
                     element={<Attendance />}
@@ -97,6 +97,7 @@ function App() {
                   />
                 }
               />
+
               <Route
                 path="/admin/classes"
                 element={

@@ -18,6 +18,11 @@ const SideBarNavigation = () => {
   const user = data?.user;
   const role = user?.role;
 
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
   const {
     data: teacherClassrooms,
     isError,
@@ -73,10 +78,9 @@ const SideBarNavigation = () => {
                     {teacherClassrooms?.map((classItem) => (
                       <li key={classItem.id}>
                         <Link
-                          to={`/attendance/${classItem.id}`}
-                          className="flex flex-row rounded-sm opacity-[.5]  hover:opacity-[1] p-2 "
+                          to={`/attendance/${classItem.id}/${year}/${month}/${day}`}
+                          className="flex flex-row rounded-sm opacity-[.5] hover:opacity-[1] p-2"
                         >
-                          {/* <FileText className="mr-2 w-[20px]" /> */}
                           {classItem.name}
                         </Link>
                       </li>

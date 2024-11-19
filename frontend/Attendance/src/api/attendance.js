@@ -17,3 +17,11 @@ export const createAttendances = async (attendances) => {
     }
   }
 };
+
+// Function to update attendance records
+export const updateAttendanceRecords = async (attendanceData) => {
+  const { data } = await axiosInstance.put("/attendances", {
+    attendances: attendanceData,
+  });
+  return data;
+};
