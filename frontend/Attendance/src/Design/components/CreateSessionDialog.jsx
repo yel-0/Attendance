@@ -11,12 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-// Function to create a new class time
-const createClassTime = async (classTimeData) => {
-  const response = await axiosInstance.post("/class-times", classTimeData);
-  return response.data;
-};
+import { createClassTime } from "@/api/classtime";
 
 const CreateSessionDialog = ({ classId, mydate }) => {
   const { toast } = useToast();

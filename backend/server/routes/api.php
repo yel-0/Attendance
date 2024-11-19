@@ -88,7 +88,7 @@ Route::middleware(['auth:api', 'check.admin'])->group(function () {
 
 // Publicly accessible routes for viewing student-class associations
 Route::middleware('auth:api')->group(function () {
-    
+
     // Retrieve all student-class associations
     Route::get('/student-classes', [StudentClassController::class, 'index']); 
 
@@ -103,24 +103,26 @@ Route::middleware('auth:api')->group(function () {
 
 
 Route::middleware('auth:api')->group(function () {
-    // List all class times
+
+    // List all class times (supports optional filtering via query parameters).
     Route::get('/class-times', [ClassTimeController::class, 'index']);
-    
-    // Create a new class time
-    Route::post('/class-times', [ClassTimeController::class, 'store']);
-    
-    // Update an existing class time
-    Route::put('/class-times/{id}', [ClassTimeController::class, 'update']);
-    
-    Route::delete('/class-times/{id}', [ClassTimeController::class, 'destroy']);
-    
+
+    // Create a new class time.
+    Route::post('/create/class-times', [ClassTimeController::class, 'store']);
+
+    // Retrieve a specific class time by ID.
     Route::get('/class-times/{id}', [ClassTimeController::class, 'show']);
 
-    Route::get('/class-times/classroom/{classroom_id}', [ClassTimeController::class, 'findByClassroomId']);
+    // Update a specific class time by ID.
+    Route::put('/class-times/{id}', [ClassTimeController::class, 'update']);
 
-    Route::get('/class-times/classroom/{classroom_id}/date/{session_date}', [ClassTimeController::class, 'findByClassroomIdAndSessionDate']);
+    // Delete a specific class time by ID.
+    Route::delete('/class-times/{id}', [ClassTimeController::class, 'destroy']);
 
+    // Retrieve class times filtered by classroom ID and optional session date via query parameters.
+    Route::get('/filter/class-times', [ClassTimeController::class, 'filter']);
 });
+
 
 
 Route::middleware('auth:api')->group(function () {
