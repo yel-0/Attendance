@@ -1,15 +1,7 @@
 import { useQuery } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
-// Define the custom hook
+import { fetchStudentClass } from "@/api/studentClass";
 export const useStudentClass = (classId) => {
-  return useQuery(
-    ["studentClass", classId],
-    async () => {
-      const response = await axiosInstance.get(`/student-classes/${classId}`);
-      return response.data;
-    },
-    {
-      enabled: !!classId, // Only fetch if classId is defined
-    }
-  );
+  return useQuery(["studentClass", classId], () => fetchStudentClass(classId), {
+    enabled: !!classId,
+  });
 };

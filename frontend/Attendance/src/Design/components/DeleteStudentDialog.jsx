@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Dialog,
@@ -11,39 +10,35 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useParams } from "react-router-dom";
+import { deleteStudent } from "@/api/studentClass";
 
 const DeleteStudentDialog = ({ student }) => {
   const queryClient = useQueryClient();
   const { id: classroomId } = useParams();
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const deleteMutation = useMutation(
-    async () => {
-      await axiosInstance.delete(`/student-classes/${student.id}`);
-    },
-    {
-      onSuccess: () => {
-        toast({
-          title: "Student Deleted Successfully",
-          description:
-            "The student has been removed from the class successfully.",
-          variant: "success",
-        });
-        queryClient.invalidateQueries(["studentClass", classroomId]);
 
-        setOpen(false);
-      },
-      onError: (error) => {
-        toast({
-          variant: "destructive",
-          title: "Error Deleting Student",
-          description: error.response
-            ? error.response.data
-            : "An error occurred while removing the student from the class. Please try again later.",
-        });
-      },
-    }
-  );
+  const deleteMutation = useMutation(() => deleteStudent(student.id), {
+    onSuccess: () => {
+      toast({
+        title: "Student Deleted Successfully",
+        description:
+          "The student has been removed from the class successfully.",
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["studentClass", classroomId]);
+      setOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error Deleting Student",
+        description: error.response
+          ? error.response.data
+          : "An error occurred while removing the student from the class. Please try again later.",
+      });
+    },
+  });
 
   // Handler for delete action
   const handleDelete = () => {
@@ -78,16 +73,6 @@ const DeleteStudentDialog = ({ student }) => {
             {deleteMutation.isLoading ? "Deleting..." : "Delete"}
           </button>
         </div>
-        {deleteMutation.isError && (
-          <div className="text-red-500 mt-4">
-            {deleteMutation.error.message}
-          </div>
-        )}
-        {deleteMutation.isSuccess && (
-          <div className="text-green-500 mt-4">
-            Student deleted successfully!
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );

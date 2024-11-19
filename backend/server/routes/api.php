@@ -72,27 +72,31 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 Route::middleware(['auth:api', 'check.admin'])->group(function () {
-    // Create a new student-class association
-    Route::post('/student-classes', [StudentClassController::class, 'store']);
-    
-    // Update an existing student-class association
-    Route::put('/student-classes/{id}', [StudentClassController::class, 'update']);
-    
-    // Delete a student-class association
-    Route::delete('/student-classes/{id}', [StudentClassController::class, 'destroy']);
 
-    Route::post('/import-student-classes', [StudentClassController::class, 'importExcel']);
+    // Create a new student-class association
+    Route::post('/student-classes', [StudentClassController::class, 'store']); 
+
+    // Update an existing student-class association by ID
+    Route::put('/student-classes/{id}', [StudentClassController::class, 'update']); 
+
+    // Delete a student-class association by ID
+    Route::delete('/student-classes/{id}', [StudentClassController::class, 'destroy']); 
+
+    // Import student-class associations from an Excel file
+    Route::post('/import-student-classes', [StudentClassController::class, 'importExcel']); 
 });
 
-// Public routes to get all student-class associations and specific ones by ID
+// Publicly accessible routes for viewing student-class associations
 Route::middleware('auth:api')->group(function () {
-    // Get all student-class associations
-    Route::get('/student-classes', [StudentClassController::class, 'index']);
     
-    // Get a specific student-class association by ID
-    Route::get('/student-classes/{id}', [StudentClassController::class, 'showByClassroomId']);
+    // Retrieve all student-class associations
+    Route::get('/student-classes', [StudentClassController::class, 'index']); 
 
-    Route::get('/my-classrooms/classrooms', [StudentClassController::class, 'getClassroomsByAuthStudent']);
+    // Retrieve student-class associations for a specific classroom by classroom ID
+    Route::get('/student-classes/{id}', [StudentClassController::class, 'showByClassroomId']); 
+
+    // Retrieve classrooms associated with the currently authenticated student
+    Route::get('/my-classrooms/classrooms', [StudentClassController::class, 'getClassroomsByAuthStudent']); 
 });
 
 

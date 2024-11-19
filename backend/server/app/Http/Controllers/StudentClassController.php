@@ -78,13 +78,16 @@ class StudentClassController extends Controller
             // Extract student_id and classroom_id values from the file
             $studentIds = $rows->pluck(0); // Assuming student_id is in the first column
             $classroomIds = $rows->pluck(1); // Assuming classroom_id is in the second column
-    
+
             // Check for duplicate student_id values in the file
             if ($studentIds->duplicates()->isNotEmpty()) {
+                $duplicates = $studentIds->duplicates()->all(); // Get the duplicate values
                 return response()->json([
                     'message' => 'Duplicate student_id values found in the file.',
+                    'duplicates' => $duplicates, // Log the duplicate student IDs
                 ], 422);
             }
+            
     
             $errors = []; // To store errors for failed rows
     

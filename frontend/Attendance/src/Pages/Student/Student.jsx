@@ -24,7 +24,7 @@ const Student = () => {
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching data.</div>;
 
-  const students = studentClass?.students || []; // Adjust based on your data structure
+  const students = studentClass?.students || [];
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">
