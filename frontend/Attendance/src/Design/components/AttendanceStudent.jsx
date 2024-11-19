@@ -194,18 +194,19 @@ const AttendanceStudent = ({ studentClass }) => {
               <TableHead>Name</TableHead>
               {timeSlots.map((slot, index) => (
                 <TableHead key={index}>
-                  <DeleteSessionDialog
-                    time={slot.time}
-                    sessionId={slot.id}
-                    mydate={formatDate(date)}
-                  />
-                  <div className="flex justify-center">
+                  <div className="flex  items-center justify-center gap-2 w-full">
+                    <DeleteSessionDialog
+                      time={slot.time}
+                      sessionId={slot.id}
+                      mydate={formatDate(date)}
+                    />
+
                     <input
                       type="checkbox"
                       onChange={(e) =>
                         handleCheckAll(slot.id, e.target.checked)
                       }
-                      className="transform scale-150 accent-blue"
+                      className="transform scale-150 accent-blue cursor-pointer"
                     />
                   </div>
                 </TableHead>
@@ -222,22 +223,24 @@ const AttendanceStudent = ({ studentClass }) => {
                 <TableCell>{student.student.name}</TableCell>
                 {timeSlots.map((slot, slotIndex) => (
                   <TableCell key={slotIndex}>
-                    <input
-                      type="checkbox"
-                      checked={
-                        attendanceRecords[`${student.student.id}-${slot.id}`]
-                          ?.attended || false
-                      }
-                      onChange={(e) => {
-                        handleSwitchChange(
-                          student.student.id,
-                          slot.time,
-                          e.target.checked,
-                          slot.id
-                        );
-                      }}
-                      className="transform scale-150 accent-blue"
-                    />
+                    <div className=" flex flex-row justify-center">
+                      <input
+                        type="checkbox"
+                        checked={
+                          attendanceRecords[`${student.student.id}-${slot.id}`]
+                            ?.attended || false
+                        }
+                        onChange={(e) => {
+                          handleSwitchChange(
+                            student.student.id,
+                            slot.time,
+                            e.target.checked,
+                            slot.id
+                          );
+                        }}
+                        className="transform scale-150 accent-blue"
+                      />
+                    </div>
                   </TableCell>
                 ))}
               </TableRow>
