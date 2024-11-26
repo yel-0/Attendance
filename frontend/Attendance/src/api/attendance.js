@@ -25,3 +25,14 @@ export const updateAttendanceRecords = async (attendanceData) => {
   });
   return data;
 };
+
+export const fetchAttendancesByMonth = async (classId, year, month) => {
+  if (!classId || !year || !month) return [];
+
+  const { data } = await axiosInstance.post("/attendances/monthly", {
+    classId: parseInt(classId), // Ensure classId is an integer
+    year,
+    month,
+  });
+  return data;
+};

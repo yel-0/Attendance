@@ -21,7 +21,7 @@ export const deleteStudent = async (studentId) => {
 };
 
 // Retrieve student-class associations for a specific classroom by classroom ID
-// Used in : Student.jsx
+// Used in : Student.jsx / viewAttendances.jsx
 export const fetchStudentClass = async (classId) => {
   const response = await axiosInstance.get(`/student-classes/${classId}`);
   return response.data;

@@ -256,67 +256,6 @@ public function getAttendancesByMonth(Request $request)
 
 
 
-// public function getAttendancesByMonthRange(Request $request)
-// {
-//     $validated = $request->validate([
-//         'year' => 'required|integer',
-//         'startMonth' => 'required|integer|min:1|max:12',
-//         'endMonth' => 'required|integer|min:1|max:12',
-//         'classId' => 'required|integer|exists:classrooms,id',
-//     ]);
-
-//     $year = $validated['year'];
-//     $startMonth = (int) $validated['startMonth'];
-//     $endMonth = (int) $validated['endMonth'];
-//     $classId = (int) $validated['classId'];
-
-//     // Log the input parameters
-//     // Log::info('Attendance Filter Params:', [
-//     //     'year' => $year,
-//     //     'startMonth' => $startMonth,
-//     //     'endMonth' => $endMonth,
-//     //     'classId' => $classId,
-//     // ]);
-
-//     // Fetch attendances with class time filtering by year, startMonth, endMonth, and classId
-//     $attendances = Attendance::with(['classTime' => function($query) {
-//             $query->select('id', 'classroom_id', 'session_date'); // Ensure to select the necessary fields
-//         }])
-//         ->whereHas('classTime', function ($query) use ($year, $startMonth, $endMonth, $classId) {
-//             $query->whereYear('session_date', $year)
-//                 ->whereMonth('session_date', '>=', $startMonth)
-//                 ->whereMonth('session_date', '<=', $endMonth)
-//                 ->where('classroom_id', $classId);
-//         })
-//         ->get();
-
-//     // Group attendances by month and calculate unique sessions based on class_time_id
-//     $attendancesByMonth = $attendances->groupBy(function ($attendance) {
-//         return Carbon::parse($attendance->classTime->session_date)->format('F');
-//     })->map(function ($attendanceRecords) {
-//         // Get unique class_time_ids
-//         $uniqueClassTimeIds = $attendanceRecords->pluck('class_time_id')->unique();
-        
-//         return [
-//             'total_sessions' => $uniqueClassTimeIds->count(),
-//             'records' => $attendanceRecords
-//         ];
-//     });
-
-//     // Log the attendances grouped by month with session counts
-//     foreach ($attendancesByMonth as $month => $attendanceData) {
-//         Log::info("Attendances for {$month}:", [
-//             'total_sessions' => $attendanceData['total_sessions'],
-//             'attendances' => $attendanceData['records']
-//         ]);
-//     }
-
-//     return response()->json($attendancesByMonth);
-// }
-
-
-
-
 public function getAttendancesByMonthRange(Request $request)
 {
     // Validation remains the same

@@ -1,23 +1,12 @@
 import { useQuery } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
+import { fetchAttendancesByMonth } from "@/api/attendance";
 
-const fetchAttendancesByMonth = async (classId, year, month) => {
-  if (!classId || !year || !month) return [];
-
-  const { data } = await axiosInstance.post("/attendances/monthly", {
-    classId: parseInt(classId), // Ensure classId is an integer
-    year,
-    month,
-  });
-  return data;
-};
-
-export const useAttendancesByMonth = (classId, year, month) => {
+export const useAttendancesByMonth = (classId, year, month, fetchData) => {
   return useQuery(
     ["attendancesByMonth", classId, year, month],
     () => fetchAttendancesByMonth(classId, year, month),
     {
-      enabled: !!classId && !!year && !!month, // Only fetch if classId, year, and month are provided
+      enabled: !!fetchData && !!classId && !!year && !!month, // Only fetch if fetchData is true and classId, year, month are provided
     }
   );
 };

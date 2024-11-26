@@ -55,11 +55,9 @@ const ViewAttendancesBySemester = () => {
 
   if (isLoading || isClassLoading) return <div>Loading...</div>;
   if (error || isClassError) return <div>Error: {error.message}</div>;
-  // console.log(data);
+
   return (
     <div>
-      {/* <h1>View Attendances By Semester</h1> */}
-
       <div className="flex flex-wrap items-center justify-center space-x-4">
         <div className="flex-1">
           <label
@@ -144,63 +142,73 @@ const ViewAttendancesBySemester = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">No</TableHead>
-
-            <TableHead className="w-[100px]">Roll Number</TableHead>
+            <TableHead className="">Roll Number</TableHead>
             <TableHead>Name</TableHead>
             {startMonthToEndMonth?.map((month, index) => (
               <TableHead key={index} className="text-center">
                 {month}
               </TableHead>
             ))}
+            <TableHead>Total (Attended/Total)</TableHead>
             <TableHead>%</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {studentClass?.students?.map((student, index) => (
-            <TableRow key={student.student.id}>
-              <TableCell className="w-[100px]">{index + 1}</TableCell>
+          {studentClass?.students?.map((student, index) => {
+            let totalAttendedCount = 0;
+            let totalSessions = 0;
 
-              <TableCell className="w-[200px]">
-                {student.student.roleNumber}
-              </TableCell>
-              <TableCell>{student.student.name}</TableCell>
-              {startMonthToEndMonth?.map((month, index) => {
-                // Fallback values for undefined data
-                const monthData = data?.[month] || {};
-                const studentAttendance =
-                  monthData?.students?.[student.student.id] || {};
-                const attendedCount = studentAttendance?.attended_count || 0;
-                const totalSessions = monthData?.total_sessions || 0;
+            startMonthToEndMonth?.forEach((month) => {
+              const monthData = data?.[month] || {};
+              const studentAttendance =
+                monthData?.students?.[student.student.id] || {};
+              const attendedCount = studentAttendance?.attended_count || 0;
+              const sessionsForMonth = monthData?.total_sessions || 0;
 
-                return (
-                  <TableCell className="text-center" key={index}>
-                    {/* Display the attended count and total sessions */}
-                    {attendedCount}{" "}
-                    {totalSessions > 0 ? "/" + totalSessions : ""}
-                  </TableCell>
-                );
-              })}
-              <TableCell>
-                {(
-                  (startMonthToEndMonth?.reduce((acc, month) => {
-                    const monthData = data[month];
-                    const studentAttendance =
-                      monthData?.students[student.student.id];
-                    const attendedCount = studentAttendance
-                      ? studentAttendance.attended_count
-                      : 0;
-                    return acc + attendedCount;
-                  }, 0) /
-                    startMonthToEndMonth?.reduce(
-                      (acc, month) => acc + data[month]?.total_sessions || 0,
-                      0
-                    )) *
-                  100
-                ).toFixed(2)}
-                %
-              </TableCell>
-            </TableRow>
-          ))}
+              totalAttendedCount += attendedCount;
+              totalSessions += sessionsForMonth;
+            });
+
+            const overallAttendancePercentage =
+              totalSessions > 0
+                ? ((totalAttendedCount / totalSessions) * 100).toFixed(2)
+                : 0;
+
+            return (
+              <TableRow
+                key={student.student.id}
+                className={
+                  overallAttendancePercentage < 75 ? "bg-red-500" : "bg-white"
+                } // Highlight row if attendance < 75%
+              >
+                <TableCell className="w-[100px]">{index + 1}</TableCell>
+                <TableCell className="w-[200px]">
+                  {student.student.roleNumber}
+                </TableCell>
+                <TableCell>{student.student.name}</TableCell>
+                {startMonthToEndMonth?.map((month, index) => {
+                  const monthData = data?.[month] || {};
+                  const studentAttendance =
+                    monthData?.students?.[student.student.id] || {};
+                  const attendedCount = studentAttendance?.attended_count || 0;
+                  const totalSessionsForMonth = monthData?.total_sessions || 0;
+
+                  return (
+                    <TableCell className="text-center" key={index}>
+                      {attendedCount}{" "}
+                      {totalSessionsForMonth > 0
+                        ? "/" + totalSessionsForMonth
+                        : ""}
+                    </TableCell>
+                  );
+                })}
+                <TableCell className="text-center">
+                  {totalAttendedCount}/{totalSessions}
+                </TableCell>
+                <TableCell>{overallAttendancePercentage}%</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

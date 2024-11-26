@@ -16,6 +16,7 @@ const ViewAttendances = () => {
   const { classId } = useParams();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
+  const [fetchData, setFetchData] = useState(false);
 
   const {
     data: studentClass,
@@ -23,11 +24,16 @@ const ViewAttendances = () => {
     isError: isClassError,
   } = useStudentClass(classId);
 
+  // Fetch attendances only when the button is clicked (controlled by fetchData)
   const {
     data: attendances,
     isLoading: isAttendancesLoading,
     isError: isAttendancesError,
-  } = useAttendancesByMonth(parseInt(classId, 10), year, month);
+  } = useAttendancesByMonth(
+    fetchData ? parseInt(classId, 10) : null,
+    year,
+    month
+  );
 
   if (isClassLoading || isAttendancesLoading) return <div>Loading...</div>;
   if (isClassError || isAttendancesError)
@@ -35,32 +41,34 @@ const ViewAttendances = () => {
 
   // Ensure that attendances_by_week is an array
   const studentAttendanceByWeek = attendances?.attendances_by_week || [];
-  console.log(studentAttendanceByWeek);
 
   return (
     <div>
-      <form className="mb-4">
-        <div className="grid gap-4 md:grid-cols-2">
+      <form className="mb-6">
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* Year Input */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-black">
+            <label className="block mb-2 text-sm font-medium text-gray-700">
               Year
             </label>
             <input
               type="number"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className="w-full p-2 border rounded-sm"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="Enter year"
             />
           </div>
+
+          {/* Month Select */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-black">
+            <label className="block mb-2 text-sm font-medium text-gray-700">
               Month
             </label>
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="w-full p-2 border rounded-sm"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
               <option value="">Select month</option>
               {[...Array(12).keys()].map((i) => (
@@ -69,6 +77,17 @@ const ViewAttendances = () => {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Fetch Button */}
+          <div className="flex items-center justify-center md:justify-end">
+            <button
+              type="button"
+              onClick={() => setFetchData(true)}
+              className="w-full md:w-auto py-3 px-6 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-200"
+            >
+              Fetch Data
+            </button>
           </div>
         </div>
       </form>
@@ -92,10 +111,8 @@ const ViewAttendances = () => {
 
         <TableBody>
           {studentClass?.students?.map((student, index) => {
-            // Calculate total attended count for the student across all weeks
             const totalAttendedCount = studentAttendanceByWeek.reduce(
               (total, week) => {
-                // Find the attendance count for the student in this week
                 const attendedCount =
                   week.students?.[student.student.id]?.attended_count || 0;
                 return total + attendedCount;
@@ -112,9 +129,10 @@ const ViewAttendances = () => {
               ? ((totalAttendedCount / totalClassTimes) * 100).toFixed(2)
               : 0;
 
-            // Conditional background class based on attendance percentage
             const rowClass =
-              attendancePercentage < 75 ? "bg-red-500 text-white" : "";
+              totalClassTimes > 0 && attendancePercentage < 75
+                ? "bg-red-500 text-white"
+                : "";
 
             return (
               <TableRow
@@ -125,7 +143,6 @@ const ViewAttendances = () => {
                 <TableCell>{student.student.roleNumber}</TableCell>
                 <TableCell>{student.student.name}</TableCell>
 
-                {/* Render attendance count for each week */}
                 {studentAttendanceByWeek.map((week, weekIndex) => {
                   const attendedCount =
                     week.students?.[student.student.id]?.attended_count || 0;
@@ -137,7 +154,6 @@ const ViewAttendances = () => {
                   );
                 })}
 
-                {/* Total Attended and Total Session */}
                 <TableCell>{totalAttendedCount}</TableCell>
                 <TableCell>{totalClassTimes}</TableCell>
                 <TableCell className="text-right">
