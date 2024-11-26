@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useToast } from "@/components/ui/use-toast"; // Adjust this import for your toast system
 import {
   Dialog,
@@ -11,9 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { importStudentClasses } from "@/api/studentClass";
+import { useParams } from "react-router-dom";
+
 const ImportStudentClassDialog = () => {
   const [file, setFile] = useState(null);
   const { toast } = useToast(); // Initialize toast
+  const queryClient = useQueryClient();
+  const { id } = useParams();
 
   // React Query mutation using the API function
   const importMutation = useMutation(importStudentClasses, {
@@ -24,6 +28,7 @@ const ImportStudentClassDialog = () => {
           data.message || "Student classes have been imported successfully.",
         variant: "success",
       });
+      queryClient.invalidateQueries(["studentClass", id]);
     },
     onError: (error) => {
       toast({
@@ -60,7 +65,9 @@ const ImportStudentClassDialog = () => {
 
   return (
     <Dialog>
-      <DialogTrigger>Import Student Classes</DialogTrigger>
+      <DialogTrigger className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none">
+        Import Student Classes
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Import Student Classes</DialogTitle>

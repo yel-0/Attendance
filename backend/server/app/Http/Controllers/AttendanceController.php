@@ -155,9 +155,6 @@ class AttendanceController extends Controller
 
 public function getAttendancesByMonth(Request $request)
 {
-    // Log the request data for debugging
-    // Log::info('Request to fetch attendances by month:', $request->all());
-
     // Validate the incoming request
     $validated = $request->validate([
         'year' => 'required|integer|digits:4',
@@ -166,24 +163,96 @@ public function getAttendancesByMonth(Request $request)
     ]);
 
     $year = $validated['year'];
-    $month = $validated['month'];
-    $classId = (int) $validated['classId']; 
+    $month = (int) $validated['month'];
+    $classId = (int) $validated['classId'];
+
+    // Get the number of days in the month
+    $numDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
     // Calculate the start and end dates for the given month
     $startDate = "{$year}-{$month}-01";
-    $endDate = "{$year}-{$month}-" . cal_days_in_month(CAL_GREGORIAN, $month, $year);
-   
+    $endDate = "{$year}-{$month}-{$numDaysInMonth}";
 
-    // Fetch attendance records within the specified month and class, filtering by session_date in classTime
-    $attendances = Attendance::whereHas('classTime', function ($query) use ($classId, $startDate, $endDate) {
-            $query->where('classroom_id', $classId)
-                  ->whereBetween('session_date', [$startDate, $endDate]); // Filter by session_date
+    // Fetch attendance records filtering by year, month, and classId
+    $attendances = Attendance::with(['classTime' => function($query) {
+            $query->select('id', 'classroom_id', 'session_date'); // Ensure necessary fields are selected
+        }])
+        ->whereHas('classTime', function ($query) use ($year, $month, $classId, $startDate, $endDate) {
+            $query->whereYear('session_date', $year)
+                ->whereMonth('session_date', $month)
+                ->where('classroom_id', $classId);
         })
-        ->with('classTime')
         ->get();
 
-    return response()->json($attendances);
+    // Calculate number of weeks (4 or 5 based on number of days)
+    $numWeeks = $numDaysInMonth <= 28 ? 4 : ($numDaysInMonth <= 30 ? 5 : 5);
+
+    // Define the week ranges dynamically
+    $weekRanges = [];
+    $startDay = 1;
+    for ($i = 0; $i < $numWeeks; $i++) {
+        $endDay = min($startDay + 6, $numDaysInMonth); // Each week is 7 days (or less for the last week)
+        $weekRanges[] = ['start' => $startDay, 'end' => $endDay];
+        $startDay = $endDay + 1;
+    }
+
+    // Group attendances by custom week ranges
+    $attendancesByWeek = collect($weekRanges)->map(function ($weekRange, $index) use ($attendances, $year, $month) {
+        // Get the start and end date of the current week range
+        $startDate = Carbon::createFromFormat('Y-m-d', "{$year}-{$month}-{$weekRange['start']}")
+                           ->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d', "{$year}-{$month}-{$weekRange['end']}")
+                         ->endOfDay();
+
+        // Filter attendance records within this week range
+        $weeklyAttendances = $attendances->filter(function ($attendance) use ($startDate, $endDate) {
+            $attendanceDate = Carbon::parse($attendance->classTime->session_date);
+            return $attendanceDate->between($startDate, $endDate);
+        });
+
+        // Group attendance records by student_id
+        $studentsAttendance = $weeklyAttendances->groupBy('student_id')->map(function ($studentRecords) {
+            $attendedCount = $studentRecords->where('attended', 1)->count(); // Count of attended records
+
+            return [
+                'student_id' => $studentRecords->first()->student_id, // Assuming each group has the same student_id
+                'attended_count' => $attendedCount, // Include count of attended sessions
+            ];
+        });
+
+        // Calculate total unique sessions using unique classTime IDs
+        $uniqueClassTimeIds = $weeklyAttendances->pluck('class_time_id')->unique();
+
+        return [
+            'students' => $studentsAttendance, // Array of students with their details
+            'total_sessions' => $uniqueClassTimeIds->count(), // Total unique sessions
+        ];
+    });
+
+    // Calculate total sessions and total attendance for each student for the entire month
+    $studentsMonthlyAttendance = $attendances->groupBy('student_id')->map(function ($studentRecords) use ($numWeeks) {
+        // Count total attendance for the student in the entire month
+        $totalAttended = $studentRecords->where('attended', 1)->count();
+
+        // Count total unique sessions for the student in the entire month
+        $uniqueClassTimeIds = $studentRecords->pluck('class_time_id')->unique();
+
+        return [
+            'total_attended' => $totalAttended, // Total attendance count for the whole month
+            'total_sessions' => $uniqueClassTimeIds->count(), // Total unique sessions for the whole month
+        ];
+    });
+
+    // Return the response in JSON format
+    return response()->json([
+        'attendances_by_week' => $attendancesByWeek,
+        'monthly_summary' => $studentsMonthlyAttendance,
+    ]);
 }
+
+
+
+
 
 
 

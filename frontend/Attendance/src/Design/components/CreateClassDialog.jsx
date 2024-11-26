@@ -11,6 +11,7 @@ import {
 import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
 import useAccountsByRole from "@/Hooks/Accounts/useAccountsByRole ";
+import { useNavigate } from "react-router-dom";
 // Function to post new classroom
 const createClassroom = async (classroomData) => {
   const response = await axiosInstance.post("/classrooms", classroomData);
@@ -22,6 +23,7 @@ const CreateClassDialog = () => {
   const { data, isError, isLoading } = useAccountsByRole("teacher");
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [teacherId, setTeacherId] = useState("");
@@ -33,6 +35,7 @@ const CreateClassDialog = () => {
       toast({
         title: "Classroom created successfully",
       });
+      // navigate("")
       setOpen(false);
     },
     onError: (error) => {

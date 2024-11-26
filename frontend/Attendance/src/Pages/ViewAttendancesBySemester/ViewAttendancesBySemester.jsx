@@ -181,7 +181,7 @@ const ViewAttendancesBySemester = () => {
                 );
               })}
               <TableCell>
-                {/* {(
+                {(
                   (startMonthToEndMonth?.reduce((acc, month) => {
                     const monthData = data[month];
                     const studentAttendance =
@@ -196,7 +196,7 @@ const ViewAttendancesBySemester = () => {
                       0
                     )) *
                   100
-                ).toFixed(2)} */}
+                ).toFixed(2)}
                 %
               </TableCell>
             </TableRow>

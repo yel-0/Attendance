@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "react-query";
 import { useToast } from "@/components/ui/use-toast";
-import axiosInstance from "@/api/axiosInstance";
+import { createClassTime } from "@/api/classtime";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { createClassTime } from "@/api/classtime";
+
+const formatDate = (date) => {
+  const [year, month, day] = date.split("-");
+  return {
+    year,
+    month: month.padStart(2, "0"),
+    day: day.padStart(2, "0"),
+  };
+};
 
 const CreateSessionDialog = ({ classId, mydate }) => {
   const { toast } = useToast();
@@ -19,7 +27,7 @@ const CreateSessionDialog = ({ classId, mydate }) => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const queryClient = useQueryClient();
-
+  const navigate = useNavigate();
   const mutation = useMutation(createClassTime, {
     onSuccess: () => {
       toast({
@@ -28,6 +36,7 @@ const CreateSessionDialog = ({ classId, mydate }) => {
       });
       queryClient.invalidateQueries(["classTimes", classId, mydate]);
       window.location.reload();
+      const { year, month, day } = formatDate(mydate);
     },
     onError: (error) => {
       toast({

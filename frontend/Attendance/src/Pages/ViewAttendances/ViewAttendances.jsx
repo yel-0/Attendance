@@ -9,11 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import calculateAttendanceByWeek from "@/Utility/attendanceUtils";
-// import { useAttendancesByMonth } from "@/Hooks/Attendances/useAttendancesByMonth";
-// import { useStudentClass } from "@/Hooks/StudentClasses/useStudentClass";
 import { useAttendancesByMonth } from "@/Hooks/Attendances/useAttendancesByMonth ";
 import { useStudentClass } from "@/Hooks/StudentClasses/useStudentClass ";
+
 const ViewAttendances = () => {
   const { classId } = useParams();
   const [year, setYear] = useState("");
@@ -35,17 +33,12 @@ const ViewAttendances = () => {
   if (isClassError || isAttendancesError)
     return <div>Error fetching data.</div>;
 
-  const studentAttendanceByWeek = attendances
-    ? calculateAttendanceByWeek(attendances, month)
-    : [];
-  // console.log(studentAttendanceByWeek);
-  const totalClassTimes = studentAttendanceByWeek?.reduce(
-    (total, week) => total + week.totalClassTimes,
-    0
-  );
+  // Ensure that attendances_by_week is an array
+  const studentAttendanceByWeek = attendances?.attendances_by_week || [];
+  console.log(studentAttendanceByWeek);
 
   return (
-    <div className="">
+    <div>
       <form className="mb-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div>
@@ -56,7 +49,7 @@ const ViewAttendances = () => {
               type="number"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className="w-full p-2 border rounded-sm "
+              className="w-full p-2 border rounded-sm"
               placeholder="Enter year"
             />
           </div>
@@ -67,7 +60,7 @@ const ViewAttendances = () => {
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="w-full p-2 border rounded-sm "
+              className="w-full p-2 border rounded-sm"
             >
               <option value="">Select month</option>
               {[...Array(12).keys()].map((i) => (
@@ -85,56 +78,71 @@ const ViewAttendances = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">No</TableHead>
-            <TableHead className="w-[200px]">Roll Number</TableHead>
+            <TableHead className="w-[150px]">Roll Number</TableHead>
             <TableHead>Name</TableHead>
-            {studentAttendanceByWeek?.length > 0 &&
+            {studentAttendanceByWeek.length > 0 &&
               studentAttendanceByWeek.map((week, index) => (
-                <TableHead key={index}>
-                  Week {week.week}
-                  {index + 1}
-                </TableHead>
+                <TableHead key={index}>Week {index + 1}</TableHead>
               ))}
+            <TableHead>Total Attended</TableHead>
             <TableHead>Total Session</TableHead>
-
             <TableHead className="text-right">%</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
           {studentClass?.students?.map((student, index) => {
-            // Calculate the total attended count for the student across all weeks
+            // Calculate total attended count for the student across all weeks
             const totalAttendedCount = studentAttendanceByWeek.reduce(
-              (total, week) =>
-                total +
-                (week.attendances[student.student.id]?.attendedCount || 0),
+              (total, week) => {
+                // Find the attendance count for the student in this week
+                const attendedCount =
+                  week.students?.[student.student.id]?.attended_count || 0;
+                return total + attendedCount;
+              },
               0
             );
 
-            // Calculate the percentage of attendance
-            const totalWeeks = studentAttendanceByWeek.length;
-            const attendancePercentage =
-              totalWeeks > 0 ? (totalAttendedCount / totalWeeks) * 100 : 0;
+            const totalClassTimes = studentAttendanceByWeek.reduce(
+              (total, week) => total + week.total_sessions,
+              0
+            );
+
+            const attendancePercentage = totalClassTimes
+              ? ((totalAttendedCount / totalClassTimes) * 100).toFixed(2)
+              : 0;
+
+            // Conditional background class based on attendance percentage
+            const rowClass =
+              attendancePercentage < 75 ? "bg-red-500 text-white" : "";
 
             return (
-              <TableRow key={student.student.id}>
+              <TableRow
+                key={student.student.id}
+                className={`${rowClass} h-[70px]`}
+              >
                 <TableCell className="w-[100px]">{index + 1}</TableCell>
                 <TableCell>{student.student.roleNumber}</TableCell>
                 <TableCell>{student.student.name}</TableCell>
 
-                {studentAttendanceByWeek.map((week) => {
-                  // Get the attended count for the specific week
-                  const totalClassTime = week.totalClassTimes;
-
+                {/* Render attendance count for each week */}
+                {studentAttendanceByWeek.map((week, weekIndex) => {
                   const attendedCount =
-                    week.attendances[student.student.id]?.attendedCount || 0;
+                    week.students?.[student.student.id]?.attended_count || 0;
+                  const totalSessions = week.total_sessions;
                   return (
-                    <TableCell key={week.week}>
-                      {attendedCount}/{totalClassTime}
+                    <TableCell key={weekIndex}>
+                      {attendedCount}/{totalSessions}
                     </TableCell>
                   );
                 })}
-                <TableCell>{totalClassTimes}</TableCell>
 
-                <TableCell className="text-right">{0}%</TableCell>
+                {/* Total Attended and Total Session */}
+                <TableCell>{totalAttendedCount}</TableCell>
+                <TableCell>{totalClassTimes}</TableCell>
+                <TableCell className="text-right">
+                  {attendancePercentage}%
+                </TableCell>
               </TableRow>
             );
           })}
