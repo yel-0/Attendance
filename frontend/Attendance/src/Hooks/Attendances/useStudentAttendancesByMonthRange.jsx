@@ -1,12 +1,5 @@
 import { useQuery } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
-const fetchStudentAttendancesByMonthRange = async (params) => {
-  const response = await axiosInstance.post(
-    "/student/attendances/month-range",
-    params
-  );
-  return response.data;
-};
+import { fetchStudentAttendancesByMonthRange } from "@/api/attendance";
 
 const useStudentAttendancesByMonthRange = ({
   year,

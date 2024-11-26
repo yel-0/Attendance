@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 const months = [
   { value: 1, label: "January" },
   { value: 2, label: "February" },
@@ -42,10 +43,11 @@ const ViewAttendanceByStudentBySem = () => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
-  //   console.log(data);
+
   const handleFetchData = () => {
     setFetchData(true); // Set fetchData to true to trigger the data fetch
   };
+
   return (
     <div>
       <div className="w-full flex flex-row justify-end py-3">
@@ -146,24 +148,30 @@ const ViewAttendanceByStudentBySem = () => {
         </TableHeader>
         <TableBody>
           {data && Object.keys(data).length > 0 ? (
-            Object.keys(data).map((month) => (
-              <TableRow key={month}>
-                <TableCell>{month}</TableCell>
-                <TableCell className="text-center">
-                  {data[month].attended_count}
-                </TableCell>
-                <TableCell className="text-center">
-                  {data[month].total_sessions}
-                </TableCell>
-                <TableCell className="text-center">
-                  {(
-                    (data[month].attended_count / data[month].total_sessions) *
-                    100
-                  ).toFixed(2)}
-                  %
-                </TableCell>
-              </TableRow>
-            ))
+            Object.keys(data).map((month) => {
+              const attendedCount = data[month].attended_count;
+              const totalSessions = data[month].total_sessions;
+              const attendancePercentage = (
+                (attendedCount / totalSessions) *
+                100
+              ).toFixed(2);
+
+              return (
+                <TableRow
+                  key={month}
+                  className={
+                    attendancePercentage < 75 ? "bg-red-500" : "bg-white"
+                  }
+                >
+                  <TableCell>{month}</TableCell>
+                  <TableCell className="text-center">{attendedCount}</TableCell>
+                  <TableCell className="text-center">{totalSessions}</TableCell>
+                  <TableCell className="text-center">
+                    {attendancePercentage}%
+                  </TableCell>
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={4} className="text-center">

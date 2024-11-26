@@ -36,3 +36,24 @@ export const fetchAttendancesByMonth = async (classId, year, month) => {
   });
   return data;
 };
+
+export const fetchAttendancesBySemester = async (semesterData) => {
+  const response = await axiosInstance.post(
+    "/attendances-by-semester",
+    semesterData
+  );
+  return response.data;
+};
+
+export const fetchAuthUserAttendancesByMonth = async (reqdata) => {
+  const { data } = await axiosInstance.post("/attendances-by-month", reqdata);
+  return data;
+};
+
+export const fetchStudentAttendancesByMonthRange = async (params) => {
+  const response = await axiosInstance.post(
+    "/student/attendances/month-range",
+    params
+  );
+  return response.data;
+};

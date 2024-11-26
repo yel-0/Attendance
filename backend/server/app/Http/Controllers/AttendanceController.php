@@ -314,33 +314,41 @@ public function getAttendancesByMonthRange(Request $request)
 }
 
 public function getAuthUserAttendancesByMonth(Request $request)
-    {
-        // Validation
-        $validated = $request->validate([
-            'year' => 'required|integer',
-            'month' => 'required|integer|min:1|max:12',
-            'classId' => 'required|integer|exists:classrooms,id',
-        ]);
+{
+    // Validation
+    $validated = $request->validate([
+        'year' => 'required|integer|digits:4',
+        'month' => 'required|integer|between:1,12',
+        'classId' => 'required|integer|exists:classrooms,id',
+    ]);
 
-        $year = $validated['year'];
-        $month = (int) $validated['month'];
-        $classId = (int) $validated['classId'];
+    $year = $validated['year'];
+    $month = (int) $validated['month'];
+    $classId = (int) $validated['classId'];
 
-        // Get the authenticated user
-        $user = Auth::user();
-        $studentId = $user->id;
+    // Get the authenticated user
+    $user = Auth::user();
+    $studentId = $user->id;
 
-        Log::info('Attendance Request:', [
-            'year' => $year,
-            'month' => $month,
-            'classId' => $classId,
-            'studentId' => $studentId,
-        ]);
+    // Get the number of days in the month
+    $numDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-        // Fetch attendances filtering by year, month, classId, and studentId
-        $attendances = Attendance::with(['classTime' => function($query) {
-            $query->select('id', 'classroom_id', 'session_date'); // Ensure necessary fields are selected
-        }])
+    // Define week ranges dynamically
+    $weekRanges = [];
+    $startDay = 1;
+    while ($startDay <= $numDaysInMonth) {
+        $endDay = min($startDay + 6, $numDaysInMonth);
+        $weekRanges[] = [
+            'start' => "{$year}-{$month}-" . str_pad($startDay, 2, '0', STR_PAD_LEFT),
+            'end' => "{$year}-{$month}-" . str_pad($endDay, 2, '0', STR_PAD_LEFT),
+        ];
+        $startDay = $endDay + 1;
+    }
+
+    // Fetch attendances filtering by user, month, year, and class
+    $attendances = Attendance::with(['classTime' => function ($query) {
+        $query->select('id', 'classroom_id', 'session_date'); // Ensure necessary fields are selected
+    }])
         ->whereHas('classTime', function ($query) use ($year, $month, $classId) {
             $query->whereYear('session_date', $year)
                 ->whereMonth('session_date', $month)
@@ -348,10 +356,44 @@ public function getAuthUserAttendancesByMonth(Request $request)
         })
         ->where('student_id', $studentId)
         ->get();
-        
-        
-        return response()->json($attendances);
-    }
+
+    // Group attendances by weeks
+    $attendancesByWeek = collect($weekRanges)->map(function ($weekRange) use ($attendances) {
+        $startDate = Carbon::parse($weekRange['start'])->startOfDay();
+        $endDate = Carbon::parse($weekRange['end'])->endOfDay();
+
+        // Filter attendance records within the current week range
+        $weeklyAttendances = $attendances->filter(function ($attendance) use ($startDate, $endDate) {
+            $attendanceDate = Carbon::parse($attendance->classTime->session_date);
+            return $attendanceDate->between($startDate, $endDate);
+        });
+
+        // Calculate total sessions and attended count for the week
+        $attendedCount = $weeklyAttendances->where('attended', 1)->count();
+        $totalSessions = $weeklyAttendances->pluck('classTime.id')->unique()->count();
+
+        return [
+            'start_date' => $startDate->toDateString(),
+            'end_date' => $endDate->toDateString(),
+            'attended_count' => $attendedCount,
+            'total_sessions' => $totalSessions,
+        ];
+    });
+
+    // Monthly summary
+    $totalAttendances = $attendances->where('attended', 1)->count();
+    $totalUniqueSessions = $attendances->pluck('classTime.id')->unique()->count();
+
+    // Return response
+    return response()->json([
+        'attendances_by_week' => $attendancesByWeek,
+        'monthly_summary' => [
+            'total_attended' => $totalAttendances,
+            'total_sessions' => $totalUniqueSessions,
+        ],
+    ]);
+}
+
 
     public function getStudentAttendancesByMonthRange(Request $request)
     {

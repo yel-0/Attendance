@@ -1,14 +1,5 @@
 import { useQuery } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
-
-const fetchAttendancesBySemester = async (semesterData) => {
-  const response = await axiosInstance.post(
-    "/attendances-by-semester",
-    semesterData
-  );
-  return response.data;
-};
-
+import { fetchAttendancesBySemester } from "@/api/attendance";
 const useAttendancesBySemester = ({
   startMonth,
   endMonth,

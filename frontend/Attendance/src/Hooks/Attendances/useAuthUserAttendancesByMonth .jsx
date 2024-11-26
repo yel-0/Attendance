@@ -1,9 +1,5 @@
 import { useQuery } from "react-query";
-import axiosInstance from "@/api/axiosInstance";
-const fetchAuthUserAttendancesByMonth = async (reqdata) => {
-  const { data } = await axiosInstance.post("/attendances-by-month", reqdata);
-  return data;
-};
+import { fetchAuthUserAttendancesByMonth } from "@/api/attendance";
 
 export const useAuthUserAttendancesByMonth = (year, month, classId) => {
   const reqdata = { year, month, classId };

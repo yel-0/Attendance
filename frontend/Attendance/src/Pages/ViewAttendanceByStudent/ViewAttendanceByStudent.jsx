@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuthUserAttendancesByMonth } from "@/Hooks/Attendances/useAuthUserAttendancesByMonth ";
-import calculateAttendanceByWeekForStudent from "@/Utility/calculateAttendanceByWeekForStudent ";
 import {
   Table,
   TableBody,
@@ -12,123 +11,65 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {
-  startOfWeek,
-  endOfWeek,
-  isWithinInterval,
-  parseISO,
-  getWeeksInMonth,
-  startOfMonth,
-  endOfMonth,
-} from "date-fns";
-
-function categorizeAttendancesByWeek(data) {
-  const year = 2024;
-  const month = 7; // August (0-based index)
-
-  // Calculate the start and end of the month
-  const monthStart = startOfMonth(new Date(year, month - 1)); // Note month - 1 for 0-based index
-  const monthEnd = endOfMonth(monthStart);
-
-  // Initialize week intervals
-  const weekIntervals = [];
-
-  let weekStart = monthStart;
-  let weekEnd;
-
-  while (weekStart <= monthEnd) {
-    // Calculate end of the week, ensuring it does not exceed the month's end
-    weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6); // Week ends 6 days after the start
-    if (weekEnd > monthEnd) weekEnd = monthEnd;
-
-    // Add the current week interval
-    weekIntervals.push({
-      start: weekStart,
-      end: weekEnd,
-      attendances: [],
-    });
-
-    // Move to the next week
-    weekStart = new Date(weekEnd);
-    weekStart.setDate(weekStart.getDate() + 1); // Start from the next day after the current week's end
-  }
-
-  // Group attendances by weeks based on the session date
-  data.forEach((attendance) => {
-    const sessionDate = parseISO(attendance.class_time.session_date); // Parse the session date
-
-    // Find the week interval where the session date falls
-    const weekInterval = weekIntervals.find(({ start, end }) => {
-      const isInInterval = isWithinInterval(sessionDate, { start, end });
-
-      // Debug: Print the start, end, and result of isWithinInterval
-      console.log(
-        `Checking interval: ${start} - ${end}, Session Date: ${sessionDate}, In Interval: ${isInInterval}`
-      );
-
-      return isInInterval;
-    });
-
-    // If the session date is within a week, add it to the respective week's attendances
-    if (weekInterval) {
-      weekInterval.attendances.push(attendance);
-    }
-  });
-
-  return weekIntervals; // Return the grouped data by weeks
-}
-
 const ViewAttendanceByStudent = () => {
   const { classId } = useParams();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
+
+  // Fetch attendance data
   const { data, isLoading, error } = useAuthUserAttendancesByMonth(
-    parseInt(year, 10),
-    parseInt(month, 10),
-    parseInt(classId, 10)
+    year ? parseInt(year, 10) : null,
+    month ? parseInt(month, 10) : null,
+    classId ? parseInt(classId, 10) : null
   );
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching attendances</div>;
-  // if (!Array.isArray(data)) return <div>No attendance data available</div>; // Added check
 
-  const result = categorizeAttendancesByWeek(data ? data : []);
-  console.log(result);
+  // Defensive check to ensure data is defined before accessing its properties
+  const { attendances_by_week = [], monthly_summary = {} } = data || {};
 
-  const res = calculateAttendanceByWeekForStudent(data, month);
+  // Calculate percentage
+  const { total_attended, total_sessions } = monthly_summary;
+  const attendancePercentage = total_sessions
+    ? ((total_attended / total_sessions) * 100).toFixed(2)
+    : 0;
+
   return (
-    <div>
-      <div className="w-full flex flex-row justify-end py-3">
+    <div className="p-6 bg-gray-100 min-h-screen">
+      {/* Navigation Link */}
+      <div className="w-full flex justify-end mb-6">
         <Link
           to={`/view/attendances/student/sem/${classId}`}
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600"
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow"
         >
-          Sem
+          Semester View
         </Link>
       </div>
-      <form className="mb-4">
-        <div className="grid gap-4 md:grid-cols-2">
+
+      {/* Form to Select Year and Month */}
+      <div className="bg-white p-6 rounded-md shadow mb-6">
+        <form className="grid gap-6 md:grid-cols-2">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Year
             </label>
             <input
               type="number"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter year"
             />
           </div>
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Month
             </label>
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select month</option>
               {[...Array(12).keys()].map((i) => (
@@ -138,42 +79,110 @@ const ViewAttendanceByStudent = () => {
               ))}
             </select>
           </div>
-        </div>
-      </form>
-      <Table className="border bg-white shadow p-2">
-        <TableCaption>Attendance Summary by Week</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Weekly</TableHead> {/* Week */}
-            <TableHead>Total Sessions</TableHead>
-            <TableHead>Attended Count</TableHead>
-            <TableHead>%</TableHead> {/* Percentage */}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {result.map((weekData, index) => {
-            const totalSessions = weekData.attendances.length;
-            const attendedCount = weekData.attendances.filter(
-              (attendance) => attendance.attended === 1
-            ).length;
-            const percentage = ((attendedCount / totalSessions) * 100).toFixed(
-              2
-            ); // Calculating the percentage
+        </form>
+      </div>
 
-            return (
+      {/* Table to Display Weekly Attendance */}
+      <div className="bg-white p-6 rounded-md shadow">
+        <Table>
+          <TableCaption>Weekly Attendance Summary</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Week Start</TableHead>
+              <TableHead>Week End</TableHead>
+              <TableHead>Attended Sessions</TableHead>
+              <TableHead>Total Sessions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {attendances_by_week.map((week, index) => (
               <TableRow key={index}>
-                <TableCell>week {weekData.week}</TableCell>{" "}
-                {/* Display week number */}
-                <TableCell>{totalSessions}</TableCell> {/* Total sessions */}
-                <TableCell>{attendedCount}</TableCell>{" "}
-                {/* Count of attended sessions */}
-                <TableCell>{percentage}%</TableCell>{" "}
-                {/* Display the attendance percentage */}
+                <TableCell>{week.start_date}</TableCell>
+                <TableCell>{week.end_date}</TableCell>
+                <TableCell>{week.attended_count}</TableCell>
+                <TableCell>{week.total_sessions}</TableCell>
               </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Monthly Summary */}
+      <div
+        className={`mt-6 p-6 rounded-md shadow ${
+          data && attendancePercentage < 75 ? "bg-red-500" : "bg-blue-50"
+        }`}
+      >
+        <h2
+          className={`text-lg font-semibold ${
+            data && attendancePercentage < 75 ? "text-white" : "text-blue-700"
+          }`}
+        >
+          Monthly Summary
+        </h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="flex items-center">
+            <span
+              className={`${
+                data && attendancePercentage < 75
+                  ? "text-white"
+                  : "text-gray-700"
+              } font-medium`}
+            >
+              Total Attended:
+            </span>
+            <span
+              className={`ml-2 ${
+                data && attendancePercentage < 75
+                  ? "text-white"
+                  : "text-gray-900"
+              }`}
+            >
+              {total_attended}
+            </span>
+          </div>
+          <div className="flex items-center">
+            <span
+              className={`${
+                data && attendancePercentage < 75
+                  ? "text-white"
+                  : "text-gray-700"
+              } font-medium`}
+            >
+              Total Sessions:
+            </span>
+            <span
+              className={`ml-2 ${
+                data && attendancePercentage < 75
+                  ? "text-white"
+                  : "text-gray-900"
+              }`}
+            >
+              {total_sessions}
+            </span>
+          </div>
+          <div className="flex items-center col-span-2">
+            <span
+              className={`${
+                data && attendancePercentage < 75
+                  ? "text-white"
+                  : "text-gray-700"
+              } font-medium`}
+            >
+              Attendance Percentage:
+            </span>
+            <span
+              className={`ml-2 font-bold ${
+                data && attendancePercentage < 75
+                  ? "text-white"
+                  : "text-gray-900"
+              }`}
+            >
+              {attendancePercentage}%
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

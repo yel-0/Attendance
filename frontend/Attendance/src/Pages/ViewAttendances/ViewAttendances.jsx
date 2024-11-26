@@ -24,22 +24,20 @@ const ViewAttendances = () => {
     isError: isClassError,
   } = useStudentClass(classId);
 
-  // Fetch attendances only when the button is clicked (controlled by fetchData)
   const {
     data: attendances,
     isLoading: isAttendancesLoading,
     isError: isAttendancesError,
-  } = useAttendancesByMonth(
-    fetchData ? parseInt(classId, 10) : null,
-    year,
-    month
-  );
+  } = useAttendancesByMonth(classId, year, month, fetchData);
+
+  const handleFetch = () => {
+    if (year && month) setFetchData(true);
+  };
 
   if (isClassLoading || isAttendancesLoading) return <div>Loading...</div>;
   if (isClassError || isAttendancesError)
     return <div>Error fetching data.</div>;
 
-  // Ensure that attendances_by_week is an array
   const studentAttendanceByWeek = attendances?.attendances_by_week || [];
 
   return (
@@ -83,7 +81,7 @@ const ViewAttendances = () => {
           <div className="flex items-center justify-center md:justify-end">
             <button
               type="button"
-              onClick={() => setFetchData(true)}
+              onClick={handleFetch}
               className="w-full md:w-auto py-3 px-6 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-200"
             >
               Fetch Data
@@ -99,10 +97,9 @@ const ViewAttendances = () => {
             <TableHead className="w-[100px]">No</TableHead>
             <TableHead className="w-[150px]">Roll Number</TableHead>
             <TableHead>Name</TableHead>
-            {studentAttendanceByWeek.length > 0 &&
-              studentAttendanceByWeek.map((week, index) => (
-                <TableHead key={index}>Week {index + 1}</TableHead>
-              ))}
+            {studentAttendanceByWeek.map((_, index) => (
+              <TableHead key={index}>Week {index + 1}</TableHead>
+            ))}
             <TableHead>Total Attended</TableHead>
             <TableHead>Total Session</TableHead>
             <TableHead className="text-right">%</TableHead>
